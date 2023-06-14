@@ -1,23 +1,23 @@
-import CreateTask from "../CreateTasks";
-import { ModalProps } from "constants/modal";
-import { useLocation } from "react-router-dom";
+export type ModalProps = {
+  isShowModal?: boolean;
+  setIsShowModal: (value: boolean) => void;
+  childComp?: React.ReactNode;
+  customStyle?: string;
+};
 
-const Modal = ({ setIsShowModal }: ModalProps) => {
-  const { pathname } = useLocation();
-  const path = pathname.split("/")[1];
-
+const Modal: React.FC<ModalProps> = ({
+  setIsShowModal,
+  childComp,
+  customStyle,
+}: ModalProps) => {
   return (
     <>
       <div
         onClick={() => setIsShowModal(false)}
-        className={`w-screen h-screen fixed bg-black opacity-50 -mt-[100px] ${
-          path !== "hide-sidebar" && "-ml-[300px]"
-        }`}
+        className={`w-screen h-screen fixed bg-black opacity-50 ${customStyle}`}
       ></div>
-      <div
-        className="fixed z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-y-6 rounded-[6px] bg-white p-8 w-[480px]"
-      >
-        <CreateTask />
+      <div className="fixed z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        {childComp}
       </div>
     </>
   );

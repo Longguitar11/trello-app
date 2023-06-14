@@ -1,27 +1,30 @@
 import { useNavigate } from "react-router-dom";
 import { Switch } from "../ui/switch";
-import { sidebar } from "../../constants/sidebar";
 import { useState } from "react";
+import Modal from "components/Modal";
+import CreateBoard from "components/CreateBoard";
+import { Board } from "constants/board";
 
 type SideBarProps = {
   setIsHidden: (isHidden: boolean) => void;
   isHidden: boolean;
+  sidebar: Board[];
+  boards: Board[];
 };
 
-const SideBar = ({ setIsHidden, isHidden }: SideBarProps) => {
-  const navigate = useNavigate()
+const SideBar = ({ setIsHidden, isHidden, sidebar, boards }: SideBarProps) => {
+  const navigate = useNavigate();
 
-  const [isSelected, setIsSelected] = useState(sidebar[0].id)
+  const [isSelected, setIsSelected] = useState(sidebar ? sidebar[0]?.id : null);
+  const [isShowModal, setIsShowModal] = useState(false);
 
   const hideSideBar = () => {
-    setIsHidden(true)
-    navigate('hide-sidebar')
-  }
+    setIsHidden(true);
+  };
 
   const showSideBar = () => {
-    setIsHidden(false)
-    navigate('/')
-  }
+    setIsHidden(false);
+  };
 
   return (
     <>
@@ -35,36 +38,52 @@ const SideBar = ({ setIsHidden, isHidden }: SideBarProps) => {
               <div className="w-[6px] h-6 rounded-[2px] bg-purple opacity-75"></div>
               <div className="w-[6px] h-6 rounded-[2px] bg-purple opacity-50"></div>
             </div>
-            <p className="font-bold text-3xl text-black">kanban</p>
+            <h1>kanban</h1>
           </section>
           <div className="flex flex-col justify-between flex-1">
             <section className="mr-6">
-              <p className="ml-8 heading-s mb-4">ALL BOARDS (3)</p>
+              <h4 className="ml-8 mb-4 text-grey">
+                ALL BOARDS ({boards ? boards.length : 0})
+              </h4>
               <div>
-                {
-                  sidebar?.map((item, index) => (
-                    <div key={index} onClick={() => setIsSelected(index)} className={`${isSelected === item.id ? 'bg-purple text-white' : 'text-purple'} gap-x-4 py-4 pl-8 flex items-center rounded-r-full hover:bg-purple hover:bg-opacity-10 hover:text-purple transition-all duration-200 cursor-pointer`}>
-                  <img
-                    className="w-4 h-4 "
-                    src={item.icon}
-                    alt="board"
-                  />
-                  <p className=" heading-m">{item.name}</p>
-                </div>
-                  ))
-                }
+                {sidebar?.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setIsSelected(index);
+                      navigate(`${item.id}`);
+                    }}
+                    className={`${
+                      isSelected === item.id
+                        ? "bg-purple text-white"
+                        : "text-grey"
+                    } gap-x-4 py-4 pl-8 flex items-center rounded-r-full hover:bg-purple hover:bg-opacity-10 hover:text-purple transition-all duration-200 cursor-pointer`}
+                  >
+                    <img
+                      className="w-4 h-4 "
+                      src="./imgs/icon-board.svg"
+                      alt="board"
+                    />
+                    <h3>{item.name}</h3>
+                  </div>
+                ))}
                 <div className="gap-x-4 py-4 pl-8 flex items-center rounded-r-full hover:bg-purple text-purple hover:bg-opacity-10 transition-all duration-200 cursor-pointer">
                   <img
                     className="w-4 h-4 "
                     src="./imgs/icon-board.svg"
                     alt="board"
                   />
-                  <p className=" heading-m">+Create New Board</p>
+                  <h3
+                    onClick={() => setIsShowModal(true)}
+                    className="text-purple"
+                  >
+                    +Create New Board
+                  </h3>
                 </div>
               </div>
             </section>
             <section className="mb-8">
-              <div className="flex justify-center items-center gap-x-6 bg-light-grey rounded-[6px] py-4 px-16 mx-6 mb-2">
+              <div className="flex justify-center items-center gap-x-6 bg-light-grey rounded-[6px] py-[14px] w-[calc(100%-48px)] mx-6 mb-2">
                 <img
                   className="w-4 h-4"
                   src="./imgs/icon-light-theme.svg"
@@ -86,19 +105,31 @@ const SideBar = ({ setIsHidden, isHidden }: SideBarProps) => {
                   src="./imgs/icon-hide-sidebar.svg"
                   alt="hide sidebar"
                 />
-                <p className="heading-m">Hide Sidebar</p>
+                <h3>Hide Sidebar</h3>
               </div>
             </section>
           </div>
         </div>
       ) : (
-        <div onClick={showSideBar} className="fixed left-0 bottom-8 bg-purple p-[20px] rounded-r-full cursor-pointer hover:bg-purple-hover transition-opacity duration-200">
+        <div
+          onClick={showSideBar}
+          className="fixed left-0 bottom-8 bg-purple p-[20px] rounded-r-full cursor-pointer hover:bg-purple-hover transition-opacity duration-200"
+        >
           <img
             className=""
             src="./imgs/icon-show-sidebar.svg"
             alt="show sidebar"
           />
         </div>
+      )}
+
+      {/* Show Modal */}
+      {isShowModal && (
+        <Modal
+          setIsShowModal={setIsShowModal}
+          childComp={<CreateBoard setIsShowModal={setIsShowModal} />}
+          customStyle="z-10"
+        />
       )}
     </>
   );

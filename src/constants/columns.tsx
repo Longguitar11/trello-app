@@ -1,19 +1,7 @@
-export type ColumnsProps = {
-    id: number,
-    name: string
-}
+import { Task } from "./task"
 
-export const columns: ColumnsProps[] = [
-    {
-        id: 0,
-        name: 'Todo',
-    },
-    {
-        id: 1,
-        name: 'Doing',
-    },
-    {
-        id: 2,
-        name: 'Done',
-    }
-]
+export type Columns = {
+    id: number,
+    name: string,
+    tasks: Task[]
+}

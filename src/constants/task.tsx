@@ -3,5 +3,6 @@ export type Task = {
     title: string
     desc: string
     subtasks: {id: number, title: string}[]
-    status: 'Todo' | 'Doing' | 'Done'
+    status: string
 }
+

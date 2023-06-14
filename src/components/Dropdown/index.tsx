@@ -1,7 +1,8 @@
 import { columns } from "../../constants/columns";
 import { useState } from "react";
 
-const Dropdown = () => {
+
+const Dropdown = ({}) => {
   const [selectedItem, setSelectedItem] = useState(columns[0].id);
   const [isDrop, setIsDrop] = useState(false);
 
@@ -43,7 +44,7 @@ const Dropdown = () => {
                 setSelectedItem(index);
                 setIsDrop(false);
               }}
-              className={`pl-[18px] text-grey heading-s py-3 cursor-pointer hover:bg-purple hover:text-white transition-all duration-200 ${
+              className={`pl-[18px] text-grey text-sm py-3 cursor-pointer hover:bg-purple hover:text-white transition-all duration-200 ${
                 item.id === selectedItem && "text-white bg-purple"
               }`}
             >
