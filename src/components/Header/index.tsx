@@ -27,7 +27,6 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
   let id = parseInt(boardId!)
 
   const board = boardCopied.filter((board) => board.id === id)[0];
-  console.log("Header: ", board);
 
   return (
     <>
@@ -42,6 +41,7 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
             <h1>kanban</h1>
           </section>
         )}
+        <h1>HELLO</h1>
         <div
           className={`${
             isHidden ? "w-[calc(100%-210px)]" : "w-[calc(100%-300px)]"
@@ -73,7 +73,7 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
               />
             )}
           </div>
-        </div>
+        h</div>
       </div>
       {isShowModal && (
         <Modal
