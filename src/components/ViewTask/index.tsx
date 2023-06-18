@@ -203,17 +203,18 @@ const ViewTask = ({
         </Select>
       </div>
     </div>
-    {/* {isShowEditTask && (
-        <Modal
-          setIsShowModal={setIsShowEditTask}
-          childComp={
-            <EditBoard
-              currentBoard={board}
-              setIsShowModal={setIsShowEditBoard}
-            />
-          }
-        />
-      )} */}
+    {isShowEditTask && (
+        // <Modal
+        //   setIsShowModal={setIsShowEditTask}
+        //   childComp={
+        //     <EditBoard
+        //       currentBoard={board}
+        //       setIsShowModal={setIsShowEditBoard}
+        //     />
+        //   }
+        // />
+        null
+      )}
       {isShowDelTask && (
         <Modal
           setIsShowModal={setIsShowDelTask}

@@ -3,10 +3,16 @@ import { useState } from "react";
 import { Button } from "components/ui";
 import { useLocation } from "react-router-dom";
 import CreateColumn from "components/CreateColumn";
+import { useSelector } from "react-redux";
+import { Board } from "constants/board";
 
 const EmptyBoard = () => {
   const { pathname } = useLocation();
   const path = pathname.split("/")[1];
+
+  const boardList: Board[] = useSelector((state: any) => state.boardStore.boards)
+
+  const board = boardList[parseInt(path)]
 
   const [isShowModal, setIsShowModal] = useState(false);
 
@@ -29,7 +35,7 @@ const EmptyBoard = () => {
       {isShowModal && (
         <Modal
           setIsShowModal={setIsShowModal}
-          childComp={<CreateColumn setIsShowModal={setIsShowModal}/>}
+          childComp={<CreateColumn board={board} setIsShowModal={setIsShowModal}/>}
           customStyle={`-mt-[100px] ${
             path !== "hide-sidebar" && "-ml-[300px]"
           }`}
