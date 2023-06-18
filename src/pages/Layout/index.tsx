@@ -8,15 +8,19 @@ import { Board } from "constants/board";
 type ContextType = { isHidden: boolean};
 
 const Layout = () => {
+  const navigate = useNavigate();
+
   const [isHidden, setIsHidden] = useState(false);
 
   const boardList: Board[] = useSelector(
     (state: any) => state.boardStore.boards
   );
-  const navigate = useNavigate();
+
+  console.log({boardList})
 
   useEffect(() => {
-    if (boardList) {
+    console.log('layout')
+    if (boardList.length > 0) {
       console.log("navigate");
       navigate(`${boardList[0].id}`);
     }
@@ -30,7 +34,7 @@ const Layout = () => {
         isHidden={isHidden}
         sidebar={boardList}
       />
-      <Header isHidden={isHidden} />
+      <Header boards={boardList} isHidden={isHidden} />
       <div
         className={`mt-[100px] min-h-[calc(100vh-100px)] flex ${
           isHidden ? "w-full" : "ml-[300px] w-[calc(100%-300px)]"

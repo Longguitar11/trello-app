@@ -1,27 +1,33 @@
 import CreateTask from "components/CreateTasks";
+import DeleteModal from "components/DeleteModal";
+import Dropdown from "components/Dropdown";
+import EditBoard from "components/EditBoard";
 import Modal from "components/Modal";
 import { Button } from "components/ui";
 import { Board } from "constants/board";
+import { EditAndDelBoard } from "constants/dropdown";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 type HeaderProps = {
   isHidden: boolean;
+  boards: Board[]
 };
 
-const Header = ({ isHidden }: HeaderProps) => {
+const Header = ({ isHidden, boards }: HeaderProps) => {
   const [isShowModal, setIsShowModal] = useState(false);
+  const [isShowEditBoard, setIsShowEditBoard] = useState(false);
+  const [isShowDelBoard, setIsShowDelBoard] = useState(false);
 
-  const boardList: Board[] = useSelector(
-    (state: any) => state.boardStore.boards
-  );
+  const [isShowDropdown, setIsShowDropdown] = useState(false);
 
   // copy board
-  let boardCopied = [...boardList];
+  let boardCopied = [...boards];
   let { boardId } = useParams();
+  let id = parseInt(boardId!)
 
-  const board = boardCopied.find((board) => board.id === parseInt(boardId!));
+  const board = boardCopied.filter((board) => board.id === id)[0];
+  console.log("Header: ", board);
 
   return (
     <>
@@ -42,7 +48,7 @@ const Header = ({ isHidden }: HeaderProps) => {
           } bg-white h-[100px] fixed right-0 top-0 flex justify-between items-center px-6 border-light border-b-2`}
         >
           <h1>Platform Launch</h1>
-          <div className="flex gap-x-6 items-center">
+          <div className="flex gap-x-6 items-center relative">
             <Button
               onClick={() => setIsShowModal(true)}
               size="l"
@@ -52,17 +58,49 @@ const Header = ({ isHidden }: HeaderProps) => {
               +Add New Task
             </Button>
             <img
-              className="w-[4.6px] h-[20px] cursor-pointer"
+              onClick={() => setIsShowDropdown(true)}
+              className="w-[4.6px] h-[20px] cursor-pointer "
               src="./imgs/icon-vertical-ellipsis.svg"
               alt="icon"
             />
+
+            {isShowDropdown && (
+              <Dropdown
+                data={EditAndDelBoard}
+                // set function must be transmit rightly follow to data of dropdown
+                setIsShowModal={[setIsShowEditBoard, setIsShowDelBoard]}
+                setIsShowDropdown={setIsShowDropdown}
+              />
+            )}
           </div>
         </div>
       </div>
       {isShowModal && (
         <Modal
           setIsShowModal={setIsShowModal}
-          childComp={<CreateTask setIsShowModal={setIsShowModal} />}
+          childComp={<CreateTask board={board} setIsShowModal={setIsShowModal} />}
+        />
+      )}
+      {isShowEditBoard && (
+        <Modal
+          setIsShowModal={setIsShowEditBoard}
+          childComp={
+            <EditBoard
+              currentBoard={board}
+              setIsShowModal={setIsShowEditBoard}
+            />
+          }
+        />
+      )}
+      {isShowDelBoard && (
+        <Modal
+          setIsShowModal={setIsShowDelBoard}
+          childComp={
+            <DeleteModal
+              boardId={board?.id}
+              setIsShowModal={setIsShowDelBoard}
+            />
+          }
         />
       )}
     </>

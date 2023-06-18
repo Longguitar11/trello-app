@@ -7,7 +7,7 @@ const boardSlice = createSlice({
   name: "board",
   initialState: { boards },
   reducers: {
-    getboardsByBoardId: (state, action) => {
+    getboardsByBoardId: (state) => {
       // filter
       state.boards = [...state.boards];
     },
@@ -15,15 +15,44 @@ const boardSlice = createSlice({
       state.boards = [...state.boards, action.payload];
       localStorage.setItem("board", JSON.stringify(state.boards));
     },
-    createATask: (state, action) => {
-      console.log("Data: ", action.payload);
+    updateABoard: (state, action) => {
       state.boards = [...action.payload];
       localStorage.setItem("board", JSON.stringify(state.boards));
     },
-    createAColumn: (state, action) => {
-      state.boards = [...action.payload];
+    removeABoard: (state, action) => {
+      state.boards = state.boards.filter(
+        (board) => board.id !== action.payload.id
+      );
       localStorage.setItem("board", JSON.stringify(state.boards));
     },
+    removeATask: (state, action) => {
+      const { boardId, columnId, taskId } = action.payload;
+      state.boards.map((board) =>
+        board.id === boardId
+          ? {
+              ...board,
+              columns: board.columns.map((col) =>
+                col.id === columnId
+                  ? {
+                      ...col,
+                      tasks: col.tasks.filter((task) => task.id !== taskId),
+                    }
+                  : col
+              ),
+            }
+          : board
+      );
+      localStorage.setItem("board", JSON.stringify(state.boards));
+    },
+    // createATask: (state, action) => {
+    //   console.log("Data: ", action.payload);
+    //   state.boards = [...action.payload];
+    //   localStorage.setItem("board", JSON.stringify(state.boards));
+    // },
+    // createAColumn: (state, action) => {
+    //   state.boards = [...action.payload];
+    //   localStorage.setItem("board", JSON.stringify(state.boards));
+    // },
     removeAllBoard: (state) => {
       state.boards = [];
       localStorage.removeItem("board");
@@ -31,6 +60,11 @@ const boardSlice = createSlice({
   },
 });
 
-export const { createABoard, createATask, createAColumn, removeAllBoard } =
-  boardSlice.actions;
+export const {
+  createABoard,
+  updateABoard,
+  removeABoard,
+  removeATask,
+  removeAllBoard,
+} = boardSlice.actions;
 export default boardSlice.reducer;

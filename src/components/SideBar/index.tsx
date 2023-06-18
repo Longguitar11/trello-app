@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Switch } from "../ui/switch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "components/Modal";
 import CreateBoard from "components/CreateBoard";
 import { Board } from "constants/board";
@@ -14,6 +14,9 @@ type SideBarProps = {
 
 const SideBar = ({ setIsHidden, isHidden, sidebar, boards }: SideBarProps) => {
   const navigate = useNavigate();
+  const { boardId } = useParams();
+
+  const id = parseInt(boardId!);
 
   const [isSelected, setIsSelected] = useState(sidebar ? sidebar[0]?.id : null);
   const [isShowModal, setIsShowModal] = useState(false);
@@ -25,6 +28,13 @@ const SideBar = ({ setIsHidden, isHidden, sidebar, boards }: SideBarProps) => {
   const showSideBar = () => {
     setIsHidden(false);
   };
+
+  // check if board id exist then sidebar id is assigned
+  useEffect(() => {
+    if (id) {
+      setIsSelected(id);
+    }
+  }, []);
 
   return (
     <>

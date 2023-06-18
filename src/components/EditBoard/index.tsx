@@ -1,24 +1,10 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button, Input, Label } from "../ui";
 import { useDispatch, useSelector } from "react-redux";
-import { createABoard } from "redux/boardSlice";
+import { updateABoard } from "redux/boardSlice";
+import { BoardForm, BoardSchema } from "components/CreateBoard";
 import { Board } from "constants/board";
-
-export const BoardSchema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, { message: "Title is required" }),
-  columns: z.array(
-    z.object({
-      id: z.number().optional(),
-      name: z.string().min(1, { message: "Title of subtask cannot be empty" }),
-      tasks: z.array(z.any()),
-    })
-  ),
-});
-
-export type BoardForm = z.infer<typeof BoardSchema>;
 
 export type BoardFormProps = {
   onSubmit?: (task: BoardForm) => void;
@@ -28,17 +14,22 @@ export type BoardFormProps = {
   submittingText?: string;
   initialData?: Partial<BoardForm>;
   setIsShowModal: (value: boolean) => void;
+  currentBoard?: Board;
 };
 
-const CreateBoard = ({
+const EditBoard = ({
   onSubmit,
-  initialData,
+  currentBoard,
+  initialData = { name: currentBoard?.name, columns: currentBoard?.columns },
   setIsShowModal,
 }: BoardFormProps) => {
   const dispatch = useDispatch();
 
-  const boardList: Board[] = useSelector((state: any) => state.boardStore.boards);
-  console.log({ boardList });
+  console.log({ currentBoard });
+
+  const boardList: Board[] = useSelector(
+    (state: any) => state.boardStore.boards
+  );
 
   const {
     handleSubmit,
@@ -57,21 +48,25 @@ const CreateBoard = ({
     name: "columns",
   });
 
-  onSubmit = (board: BoardForm) => {
-    dispatch(createABoard({ ...board, id: boardList?.length | 0 }));
-    console.log(board);
+  onSubmit = (editedBoard: BoardForm) => {
+    console.log({ ...editedBoard });
+    const data = { ...editedBoard, id: currentBoard?.id };
+    console.log({ data });
+    dispatch(
+      updateABoard(
+        boardList.map((board) =>
+          board.id === currentBoard?.id ? { ...data } : board
+        )
+      )
+    );
     setIsShowModal(false);
   };
 
   console.log({ errors });
 
   return (
-    <form
-    className="space-y-6"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <h2 className="">Add New Board</h2>
-
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <h2 className="">Edit Board</h2>
       <div className="space-y-2">
         <Label className="text-sm font-bold" htmlFor="name">
           Name
@@ -88,8 +83,8 @@ const CreateBoard = ({
         )}
       </div>
 
-      <div >
-        <Label className="text-sm font-bold mb-2" htmlFor="columns">
+      <div className="space-y-2">
+        <Label className="text-sm font-bold" htmlFor="columns">
           Columns
         </Label>
         {fields.map((field, index) => (
@@ -116,17 +111,25 @@ const CreateBoard = ({
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() => append({ id: fields.length, name: "", tasks: [] })}
+          onClick={() =>
+            append({
+              id:
+                currentBoard?.columns &&
+                currentBoard?.columns[currentBoard?.columns.length - 1].id + 1,
+              name: "",
+              tasks: [],
+            })
+          }
         >
           +Add New Columns
         </Button>
       </div>
 
       <Button className="w-full" type="submit">
-        Create Board
+        Save Changes
       </Button>
     </form>
   );
 };
 
-export default CreateBoard;
+export default EditBoard;

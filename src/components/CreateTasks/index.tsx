@@ -12,23 +12,22 @@ import {
   SelectValue,
 } from "components/ui/select";
 import { Board } from "constants/board";
-import { createATask } from "redux/boardSlice";
-import { useParams } from "react-router-dom";
+import { updateABoard } from "redux/boardSlice";
 
 const TaskSchema = z.object({
+  id: z.number().optional(),
   title: z.string().min(1, { message: "Title is required" }),
   desc: z.string().min(1, { message: "Description is required" }),
   subtasks: z.array(
     z.object({
       id: z.number(),
       title: z.string().min(1, { message: "Title of subtask cannot be empty" }),
+      isDone: z.boolean(),
     })
   ),
-  status: z
-    .string()
-    .min(1, {
-      message: "The character length of status must be greater than 1",
-    }),
+  status: z.string().min(1, {
+    message: "The character length of status must be greater than 1",
+  }),
 });
 
 export type TaskForm = z.infer<typeof TaskSchema>;
@@ -41,26 +40,23 @@ export type TaskFormProps = {
   submittingText?: string;
   initialData?: Partial<TaskForm>;
   setIsShowModal: (value: boolean) => void;
-  // boards?: Board;
+  board: Board;
 };
 
 const CreateTask = ({
   onSubmit,
-  initialData = { subtasks: [{ id: 0, title: "" }], status: "todo" },
+  initialData = {
+    subtasks: [{ id: 0, title: "", isDone: false }],
+    status: "todo",
+  },
   setIsShowModal,
-}: // boards,
-TaskFormProps) => {
+  board,
+}: TaskFormProps) => {
   const dispatch = useDispatch();
 
   const boardList: Board[] = useSelector(
     (state: any) => state.boardStore.boards
   );
-
-  const boardCopied = [...boardList];
-
-  let { boardId } = useParams();
-
-  const boards = boardCopied.find((board) => board.id === parseInt(boardId!));
 
   const {
     handleSubmit,
@@ -80,38 +76,37 @@ TaskFormProps) => {
   });
 
   onSubmit = (task: TaskForm) => {
-    // Find index of column to find task correctly
-    let index = boards?.columns.findIndex(
+    // Find column that task want to come
+    let currentColumn = board.columns.filter(
       (column) => column.name === task.status
-    );
+    )[0];
+    console.log({ currentColumn });
 
     // the task will be appended to corresponding to its column
     const output = {
+      id:
+        currentColumn.tasks.length > 0
+          ? currentColumn.tasks[currentColumn.tasks.length - 1].id + 1
+          : 0,
       ...task,
-      id: boards ? boards?.columns[`${index!}`]?.tasks.length : 0,
     };
 
-    // Find Column need update
-    const selectedColumn = boards?.columns?.find(
-      (column) => column?.name === task.status
-    );
-
-    // If column exist, continue...
-    if (selectedColumn) {
-      // copy task
-      let copiedTask = [...selectedColumn.tasks];
-      // assign copied task with new value
+    // If column exist, let do it...
+    if (currentColumn) {
+      // copy task array
+      let copiedTask = [...currentColumn.tasks];
+      // assign copied task with new array
       copiedTask = [...copiedTask, output];
       console.log(copiedTask);
       // add task to redux
       dispatch(
-        createATask(
-          boardList.map((board) =>
-            board.id === boards?.id
+        updateABoard(
+          boardList.map((b) =>
+            b.id === board.id
               ? {
-                  ...board,
-                  columns: board.columns.map((column) =>
-                    column.id === index
+                  ...b,
+                  columns: b.columns.map((column) =>
+                    column.id === currentColumn.id
                       ? { ...column, tasks: copiedTask }
                       : column
                   ),
@@ -126,10 +121,7 @@ TaskFormProps) => {
   };
 
   return (
-    <form
-      className="flex flex-col gap-y-6 rounded-[6px] bg-white p-8 w-[480px]"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <h2 className="">Add New Task</h2>
       <div className="space-y-2">
         <Label className="text-sm font-bold" htmlFor="title">
@@ -190,7 +182,9 @@ TaskFormProps) => {
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() => append({ id: fields.length, title: "" })}
+          onClick={() =>
+            append({ id: fields.length, title: "", isDone: false })
+          }
         >
           +Add New Subtask
         </Button>
@@ -204,7 +198,7 @@ TaskFormProps) => {
           name="status"
           render={({ field }) => (
             <Select
-              // defaultValue={boards && boards?.columns[0].name}
+              // defaultValue={boards?.columns[0].name}
               value={field.value}
               onValueChange={(value) => {
                 field.onChange({
@@ -218,7 +212,7 @@ TaskFormProps) => {
                 <SelectValue placeholder="Select the status of the task" />
               </SelectTrigger>
               <SelectContent>
-                {boards?.columns.map((column) => (
+                {board?.columns.map((column) => (
                   <SelectItem key={column.id} value={column.name}>
                     {column.name}
                   </SelectItem>
