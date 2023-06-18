@@ -41,7 +41,6 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
             <h1>kanban</h1>
           </section>
         )}
-        <h1>HELLO</h1>
         <div
           className={`${
             isHidden ? "w-[calc(100%-210px)]" : "w-[calc(100%-300px)]"
@@ -73,7 +72,7 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
               />
             )}
           </div>
-        h</div>
+        </div>
       </div>
       {isShowModal && (
         <Modal
