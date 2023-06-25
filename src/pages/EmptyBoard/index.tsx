@@ -20,13 +20,13 @@ const EmptyBoard = () => {
     <>
       <div className="m-auto">
         <section className="gap-y-8 flex-col items-center flex">
-          <h2 className="text-grey">
+          <h2 className="text-grey text-center">
             This board is empty. Create a new column to get started.
           </h2>
           <Button
             onClick={() => setIsShowModal(true)}
             size="l"
-            className="px-4"
+            className="px-4 whitespace-nowrap"
           >
             +Add New Column
           </Button>

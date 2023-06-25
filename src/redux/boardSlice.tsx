@@ -1,5 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Board } from "constants/board";
+import { Task } from "constants/task";
 
 const boards: Board[] = JSON.parse(localStorage.getItem("board")!) || [];
 
@@ -25,9 +26,39 @@ const boardSlice = createSlice({
       );
       localStorage.setItem("board", JSON.stringify(state.boards));
     },
-    removeATask: (state, action) => {
+    updateATask: (
+      state,
+      action: PayloadAction<{ boardId: number; columnId: number; task: Task }>
+    ) => {
+      const {boardId, columnId, task} = action.payload
+      state.boards = state.boards.map((board) =>
+        board.id === boardId
+          ? {
+              ...board,
+              columns: board.columns.map((col) =>
+                col.id === columnId
+                  ? {
+                      ...col,
+                      tasks: col.tasks.map(t => t.id === task.id ? {...task} : t),
+                    }
+                  : col
+              ),
+            }
+          : board
+      );
+      console.log('edit task ', state.boards)
+      localStorage.setItem("board", JSON.stringify(state.boards));
+    },
+    removeATask: (
+      state,
+      action: PayloadAction<{
+        boardId?: number;
+        columnId?: number;
+        taskId?: number;
+      }>
+    ) => {
       const { boardId, columnId, taskId } = action.payload;
-      state.boards.map((board) =>
+      state.boards = state.boards.map((board) =>
         board.id === boardId
           ? {
               ...board,
@@ -44,15 +75,7 @@ const boardSlice = createSlice({
       );
       localStorage.setItem("board", JSON.stringify(state.boards));
     },
-    // createATask: (state, action) => {
-    //   console.log("Data: ", action.payload);
-    //   state.boards = [...action.payload];
-    //   localStorage.setItem("board", JSON.stringify(state.boards));
-    // },
-    // createAColumn: (state, action) => {
-    //   state.boards = [...action.payload];
-    //   localStorage.setItem("board", JSON.stringify(state.boards));
-    // },
+    
     removeAllBoard: (state) => {
       state.boards = [];
       localStorage.removeItem("board");
@@ -64,6 +87,7 @@ export const {
   createABoard,
   updateABoard,
   removeABoard,
+  updateATask,
   removeATask,
   removeAllBoard,
 } = boardSlice.actions;

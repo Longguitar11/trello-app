@@ -20,10 +20,10 @@ const Card = ({
   return (
     <div
       onClick={onClick}
-      className="py-6 px-4 w-[280px] rounded-[8px] bg-white bg-opacity-9 shadow-md cursor-pointer"
+      className="py-6 px-4 w-[280px] rounded-[8px] dark:bg-dark-grey bg-white bg-opacity-9 shadow-md cursor-pointer"
     >
-      <h3 className="mb-2">{title}</h3>
-      <h4 className="text-grey ">
+      <h3 className="dark:text-white mb-2 truncate">{title}</h3>
+      <h4 className="text-grey">
         {countSubtaskDone(task?.subtasks)} of {task?.subtasks?.length} subtasks
       </h4>
     </div>

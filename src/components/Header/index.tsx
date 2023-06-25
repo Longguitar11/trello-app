@@ -1,70 +1,132 @@
+import CreateBoard from "components/CreateBoard";
 import CreateTask from "components/CreateTasks";
 import DeleteModal from "components/DeleteModal";
 import Dropdown from "components/Dropdown";
 import EditBoard from "components/EditBoard";
 import Modal from "components/Modal";
+import SideBarModal from "components/Modal/SideBarModal";
+import MobileSideBar from "components/SideBar/MobileSideBar";
 import { Button } from "components/ui";
 import { Board } from "constants/board";
 import { EditAndDelBoard } from "constants/dropdown";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 type HeaderProps = {
   isHidden: boolean;
-  boards: Board[]
+  boards: Board[];
+  currentBoard: Board;
+  sideBarData: {
+    setIsHidden: (value: boolean) => void;
+    isHidden: boolean;
+    isDark: boolean;
+    setIsDark: (value: boolean) => void;
+  };
 };
 
-const Header = ({ isHidden, boards }: HeaderProps) => {
+const Header = ({
+  isHidden,
+  boards,
+  currentBoard,
+  sideBarData,
+}: HeaderProps) => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [isShowEditBoard, setIsShowEditBoard] = useState(false);
   const [isShowDelBoard, setIsShowDelBoard] = useState(false);
-
   const [isShowDropdown, setIsShowDropdown] = useState(false);
+  const [isChevron, setIsChevron] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [isShowCreateBoard, setIsShowCreateBoard] = useState(false);
 
-  // copy board
-  let boardCopied = [...boards];
-  let { boardId } = useParams();
-  let id = parseInt(boardId!)
+  const clickDropdown = () => {
+    if (currentBoard) setIsShowDropdown(!isShowDropdown);
+  };
 
-  const board = boardCopied.filter((board) => board.id === id)[0];
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <>
-      <div className="flex">
+      <div
+        className={`${
+          isHidden
+            ? "w-full"
+            : "ta:w-[calc(100%-300px)] mo:w-[calc(100%-260px)] w-full"
+        } dark:bg-dark-grey bg-white ta:h-[100px] mo:h-[80px] h-16 fixed right-0 top-0 flex dark:border-dark border-light border-b-2`}
+      >
         {isHidden && (
-          <section className="fixed top-0 left-0 flex items-center gap-x-4 p-8 w-[210px] h-[100px] border-light border-b-2 border-r-2">
+          <section className="flex justify-center items-center gap-x-4 ta:w-[210px] w-[200px] dark:border-dark border-light border-r-2">
             <div className="flex items-center gap-x-[3px]">
               <div className="w-[6px] h-6 rounded-[2px] bg-purple"></div>
               <div className="w-[6px] h-6 rounded-[2px] bg-purple opacity-75"></div>
               <div className="w-[6px] h-6 rounded-[2px] bg-purple opacity-50"></div>
             </div>
-            <h1>kanban</h1>
+            <h1 className="dark:text-white font-black">kanban</h1>
           </section>
         )}
         <div
-          className={`${
-            isHidden ? "w-[calc(100%-210px)]" : "w-[calc(100%-300px)]"
-          } bg-white h-[100px] fixed right-0 top-0 flex justify-between items-center px-6 border-light border-b-2`}
+          className={`flex-1 flex justify-between items-center ${
+            isHidden ? "ta:px-8 mo:px-6" : "mo:px-6 px-4"
+          }`}
         >
-          <h1>Platform Launch</h1>
-          <div className="flex gap-x-6 items-center relative">
+          <div className="flex items-center gap-x-4">
+            {screenWidth <= 375 && (
+              <div className="flex items-center gap-x-[3px]">
+                <div className="w-[6px] h-6 rounded-[2px] bg-purple"></div>
+                <div className="w-[6px] h-6 rounded-[2px] bg-purple opacity-75"></div>
+                <div className="w-[6px] h-6 rounded-[2px] bg-purple opacity-50"></div>
+              </div>
+            )}
+            <h1 className="dark:text-white ta:text-xl mo:text-[20px] text-l whitespace-nowrap">
+              Platform Launch
+            </h1>
+            {screenWidth <= 375 && (
+              <div
+                onClick={() => setIsChevron(true)}
+                className="flex items-center gap-x-[3px] p-2 rounded-sm dark:hover:bg-dark hover:bg-light-grey"
+              >
+                <img src="./imgs/icon-chevron-down.svg" alt="" />
+              </div>
+            )}
+          </div>
+          <div className="flex gap-x-4 mo:gap-x-6 items-center relative">
             <Button
               onClick={() => setIsShowModal(true)}
-              size="l"
-              className="px-6"
-              disabled={board ? !(board?.columns.length > 0) : true}
+              size={screenWidth <= 375 ? "default" : "l"}
+              className="px-[18px] mo:px-6 whitespace-nowrap"
+              disabled={
+                currentBoard ? !(currentBoard?.columns.length > 0) : true
+              }
             >
-              +Add New Task
+              {screenWidth <= 375 ? (
+                <img src="./imgs/icon-add-task-mobile.svg" alt="add task" />
+              ) : (
+                "+Add New Task"
+              )}
             </Button>
-            <img
-              onClick={() => setIsShowDropdown(true)}
-              className="w-[4.6px] h-[20px] cursor-pointer "
-              src="./imgs/icon-vertical-ellipsis.svg"
-              alt="icon"
-            />
+            <div
+              className="p-2 rounded-[4px] cursor-pointer dark:hover:bg-dark hover:bg-light-grey transition-colors duration-200"
+              onClick={clickDropdown}
+            >
+              <img
+                className="w-[4.6px] h-[20px]"
+                src="./imgs/icon-vertical-ellipsis.svg"
+                alt="icon"
+              />
+            </div>
 
             {isShowDropdown && (
               <Dropdown
+                customStyle="top-16"
                 data={EditAndDelBoard}
                 // set function must be transmit rightly follow to data of dropdown
                 setIsShowModal={[setIsShowEditBoard, setIsShowDelBoard]}
@@ -77,7 +139,9 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
       {isShowModal && (
         <Modal
           setIsShowModal={setIsShowModal}
-          childComp={<CreateTask board={board} setIsShowModal={setIsShowModal} />}
+          childComp={
+            <CreateTask board={currentBoard} setIsShowModal={setIsShowModal} />
+          }
         />
       )}
       {isShowEditBoard && (
@@ -85,7 +149,7 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
           setIsShowModal={setIsShowEditBoard}
           childComp={
             <EditBoard
-              currentBoard={board}
+              currentBoard={currentBoard}
               setIsShowModal={setIsShowEditBoard}
             />
           }
@@ -96,10 +160,33 @@ const Header = ({ isHidden, boards }: HeaderProps) => {
           setIsShowModal={setIsShowDelBoard}
           childComp={
             <DeleteModal
-              boardId={board?.id}
+              boards={boards}
+              currentBoard={currentBoard}
               setIsShowModal={setIsShowDelBoard}
             />
           }
+        />
+      )}
+      {isChevron && (
+        <SideBarModal
+          setIsShowModal={setIsChevron}
+          childComp={
+            <MobileSideBar
+              boards={boards}
+              isDark={sideBarData.isDark}
+              setIsDark={sideBarData.setIsDark}
+              setIsShowModal={setIsShowCreateBoard}
+              setIsChevron={setIsChevron}
+            />
+          }
+        />
+      )}
+      {/* Show Modal */}
+      {isShowCreateBoard && (
+        <Modal
+          setIsShowModal={setIsShowCreateBoard}
+          childComp={<CreateBoard setIsShowModal={setIsShowModal} />}
+          customStyle="z-10"
         />
       )}
     </>

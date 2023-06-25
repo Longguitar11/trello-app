@@ -20,18 +20,20 @@ export type ColumnFormProps = {
   submittingText?: string;
   initialData?: Partial<ColumnForm>;
   setIsShowModal: (value: boolean) => void;
-  board: Board
+  board: Board;
 };
 
 const CreateColumn = ({
   onSubmit,
   initialData = {},
   setIsShowModal,
-  board
+  board,
 }: ColumnFormProps) => {
   const dispatch = useDispatch();
 
-  const boardList: Board[] = useSelector((state: any) => state.boardStore?.boards)
+  const boardList: Board[] = useSelector(
+    (state: any) => state.boardStore?.boards
+  );
 
   const {
     handleSubmit,
@@ -45,21 +47,26 @@ const CreateColumn = ({
 
   onSubmit = (column: ColumnForm) => {
     const result = {
-      id: board.columns[board.columns.length - 1].id + 1 | 0,
+      id:
+        board.columns.length > 0
+          ? board.columns[board.columns.length - 1].id + 1
+          : 0,
       ...column,
       tasks: [],
     };
 
+    console.log("create column ", result);
+
     // add task to redux
     dispatch(
       updateABoard(
-        boardList.map((b: Board) =>
+        boardList.map((b) =>
           b.id === board.id
             ? {
                 ...b,
                 columns: [...b.columns, result],
               }
-            : board
+            : b
         )
       )
     );
@@ -71,9 +78,9 @@ const CreateColumn = ({
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      <h2 className="">Add New Column</h2>
+      <h2 className="dark:text-white">Add New Column</h2>
       <div className="space-y-2">
-        <Label className="text-sm font-bold" htmlFor="name">
+        <Label className="text-sm font-bold dark:text-white" htmlFor="name">
           Column
         </Label>
         <Input

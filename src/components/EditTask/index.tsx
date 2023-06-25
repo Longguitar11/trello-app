@@ -1,9 +1,8 @@
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button, Input, Label } from "../ui";
 import { Textarea } from "../ui/textarea";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   Select,
   SelectContent,
@@ -12,28 +11,12 @@ import {
   SelectValue,
 } from "components/ui/select";
 import { Board } from "constants/board";
-import { updateABoard } from "redux/boardSlice";
+import { updateABoard, updateATask } from "redux/boardSlice";
+import { TaskForm, TaskSchema } from "components/CreateTasks";
+import { Task } from "constants/task";
 import { useState } from "react";
 
-export const TaskSchema = z.object({
-  id: z.number().optional(),
-  title: z.string().min(1, { message: "Title is required" }),
-  desc: z.string().min(1, { message: "Description is required" }),
-  subtasks: z.array(
-    z.object({
-      id: z.number(),
-      title: z.string().min(1, { message: "Title of subtask cannot be empty" }),
-      isDone: z.boolean(),
-    })
-  ),
-  status: z.string().min(1, {
-    message: "The character length of status must be greater than 1",
-  }),
-});
-
-export type TaskForm = z.infer<typeof TaskSchema>;
-
-export type TaskFormProps = {
+export type EditTaskFormProps = {
   onSubmit?: (task: TaskForm) => void;
   mode?: "create" | "edit";
   submitting?: boolean;
@@ -41,31 +24,37 @@ export type TaskFormProps = {
   submittingText?: string;
   initialData?: Partial<TaskForm>;
   setIsShowModal: (value: boolean) => void;
+  setIsShowParModal: (value: boolean) => void;
+  boards: Board[];
   board: Board;
+  columnId: number;
+  currentTask: Task;
 };
 
-const CreateTask = ({
+const EditTask = ({
   onSubmit,
+  currentTask,
   initialData = {
-    subtasks: [{ id: 0, title: "", isDone: false }],
-    status: "todo",
+    title: currentTask?.title,
+    desc: currentTask?.desc,
+    subtasks: currentTask?.subtasks,
+    status: currentTask?.status,
   },
   setIsShowModal,
+  setIsShowParModal,
+  boards,
   board,
-}: TaskFormProps) => {
+  columnId,
+}: EditTaskFormProps) => {
   const dispatch = useDispatch();
 
-  console.log('board in create task ', board)
-
-  console.log('rerender')
-
-  const [subtaskId, setSubtaskId] = useState(0);
-
-  console.log('current subtask id ', subtaskId)
-
-  const boardList: Board[] = useSelector(
-    (state: any) => state.boardStore.boards
+  const [subtaskId, setSubtaskId] = useState(
+    currentTask.subtasks.length > 0
+      ? currentTask.subtasks[currentTask.subtasks.length - 1].id + 1
+      : 0
   );
+
+  console.log({ currentTask });
 
   const {
     handleSubmit,
@@ -84,54 +73,81 @@ const CreateTask = ({
     name: "subtasks",
   });
 
-  onSubmit = (task: TaskForm) => {
-    // Find column that task want to come
-    let currentColumn = board.columns.filter(
-      (column) => column.name === task.status
-    )[0];
-    console.log({ currentColumn });
+  const createTaskId = (id: number) => {
+    console.log("create ID", id);
+    if (id >= 0) {
+      return id + 1;
+    } else {
+      return 0;
+    }
+  };
 
+  const changeStatus = (task: Task) => {
+    // find column to move
+    const targetColumn = board.columns.filter(
+      (col) => col.name === task.status
+    )[0];
+
+    // task will be moved
+    const copiedTask: Task = {
+      ...task,
+      id:
+        targetColumn.tasks.length > 0
+          ? createTaskId(targetColumn?.tasks[targetColumn.tasks.length - 1].id)
+          : 0,
+    };
+
+    console.log({ copiedTask });
+
+    dispatch(
+      updateABoard(
+        boards.map((b) =>
+          b.id === board.id
+            ? {
+                ...b,
+                columns: b.columns.map((col) => {
+                  // remove current task in current column
+                  if (col.id === columnId) {
+                    return {
+                      ...col,
+                      tasks: col.tasks.filter((t) => t.id !== currentTask.id),
+                    };
+                  }
+                  // add new task to new column
+                  else if (col.name === task.status) {
+                    return { ...col, tasks: [...col.tasks, copiedTask] };
+                  } else {
+                    return col;
+                  }
+                }),
+              }
+            : b
+        )
+      )
+    );
+  };
+
+  onSubmit = (task: TaskForm) => {
     // the task will be appended to corresponding to its column
     const output = {
-      id:
-        currentColumn.tasks.length > 0
-          ? currentColumn.tasks[currentColumn.tasks.length - 1].id + 1
-          : 0,
+      id: currentTask?.id,
       ...task,
     };
 
-    // If column exist, let do it...
-    if (currentColumn) {
-      // copy task array
-      let copiedTask = [...currentColumn.tasks];
-      // assign copied task with new array
-      copiedTask = [...copiedTask, output];
-      console.log(copiedTask);
-      // add task to redux
-      dispatch(
-        updateABoard(
-          boardList.map((b) =>
-            b.id === board.id
-              ? {
-                  ...b,
-                  columns: b.columns.map((column) =>
-                    column.id === currentColumn.id
-                      ? { ...column, tasks: copiedTask }
-                      : column
-                  ),
-                }
-              : b
-          )
-        )
-      );
-    }
+    console.log({ output });
 
+    if (task.status !== currentTask.status) {
+      changeStatus(output);
+      setIsShowParModal(false);
+    } else {
+      dispatch(updateATask({ boardId: board.id, columnId, task: output }));
+    }
     setIsShowModal(false);
   };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      <h2 className="dark:text-white">Add New Task</h2>
+      <h2 className="dark:text-white">Edit Task</h2>
       <div className="space-y-2">
         <Label className="text-sm font-bold dark:text-white" htmlFor="title">
           Title
@@ -175,7 +191,11 @@ const CreateTask = ({
               placeholder="e.g. Make coffee"
             />
             <img
-              onClick={() => {remove(index); fields.length === 1 && setSubtaskId(0)}}
+              onClick={() => {
+                remove(index);
+                console.log("field length ", fields.length);
+                if (fields.length === 1) setSubtaskId(0);
+              }}
               className="w-4 h-4 cursor-pointer"
               src="./imgs/icon-cross.svg"
               alt="cross"
@@ -192,8 +212,12 @@ const CreateTask = ({
           variant="secondary"
           className="w-full"
           onClick={() => {
+            append({
+              id: subtaskId,
+              title: "",
+              isDone: false,
+            });
             setSubtaskId((pre) => pre + 1);
-            append({ id: subtaskId + 1, title: "", isDone: false });
             console.log("add subtask id ", subtaskId);
           }}
         >
@@ -223,7 +247,7 @@ const CreateTask = ({
                 <SelectValue placeholder="Select the status of the task" />
               </SelectTrigger>
               <SelectContent>
-                {board?.columns.map((column) => (
+                {board.columns.map((column) => (
                   <SelectItem key={column.id} value={column.name}>
                     {column.name}
                   </SelectItem>
@@ -239,10 +263,10 @@ const CreateTask = ({
         )}
       </div>
       <Button className="w-full" type="submit">
-        Create Task
+        Save Changes
       </Button>
     </form>
   );
 };
 
-export default CreateTask;
+export default EditTask;

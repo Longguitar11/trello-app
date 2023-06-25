@@ -6,12 +6,20 @@ module.exports = {
     "./src/**/*.{ts,tsx}",
   ],
   theme: {
+    screens: {
+      // mobile
+      'mo': '375px',
+      // tablet
+      'ta' : '768px',
+      // desktop
+      'de' : '1440px'
+    },
     colors: {
       purple: "#635FC7",
       "purple-hover": "#A8A4FF",
       black: "#000112",
       "very-dark-grey": "#20212C",
-      "dark-gray": "#2B2C37",
+      "dark-grey": "#2B2C37",
       dark: "#3E3F4E",
       grey: "#828FA3",
       light: "#E4EBFA",
@@ -75,11 +83,7 @@ module.exports = {
       },
     },
     extend: {
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
+     
       keyframes: {
         "accordion-down": {
           from: { height: 0 },

@@ -1,6 +1,4 @@
-import DeleteModal from "components/DeleteModal";
 import Dropdown from "components/Dropdown";
-import Modal from "components/Modal";
 import {
   Select,
   SelectContent,
@@ -19,20 +17,23 @@ import { updateABoard } from "redux/boardSlice";
 type ViewTaskProps = {
   task: Task;
   columnId: number;
-  boardId: number;
+  currentBoard: Board;
   setIsShowModal: (value: boolean) => void;
+  isShowModal: boolean;
+  valueStates: boolean[]
+  setStates: ((value: boolean) => void)[]
 };
 
 const ViewTask = ({
   task,
-  boardId,
+  currentBoard,
   columnId,
   setIsShowModal,
+  isShowModal,
+  setStates
 }: ViewTaskProps) => {
   const dispatch = useDispatch();
 
-  const [isShowEditTask, setIsShowEditTask] = useState(false);
-  const [isShowDelTask, setIsShowDelTask] = useState(false);
   const [isShowDropdown, setIsShowDropdown] = useState(false);
 
   const boards: Board[] = useSelector((state: any) => state.boardStore.boards);
@@ -60,7 +61,7 @@ const ViewTask = ({
     dispatch(
       updateABoard(
         boards.map((board) =>
-          board.id === boardId
+          board.id === currentBoard.id
             ? {
                 ...board,
                 columns: board.columns.map((column) =>
@@ -100,7 +101,7 @@ const ViewTask = ({
 
   const changeStatus = (status: string) => {
     // find column to move
-    const targetColumn = boards[boardId].columns.filter(
+    const targetColumn = currentBoard.columns.filter(
       (col) => col.name === status
     )[0];
 
@@ -118,16 +119,19 @@ const ViewTask = ({
     dispatch(
       updateABoard(
         boards.map((board) =>
-          board.id === boardId
+          board.id === currentBoard.id
             ? {
                 ...board,
                 columns: board.columns.map((col) => {
+                  // remove current task in current column
                   if (col.id === columnId) {
                     return {
                       ...col,
                       tasks: col.tasks.filter((t) => t.id !== task.id),
                     };
-                  } else if (col.name === status) {
+                  }
+                  // add new task to new column
+                  else if (col.name === status) {
                     return { ...col, tasks: [...col.tasks, copiedTask] };
                   } else {
                     return col;
@@ -142,92 +146,83 @@ const ViewTask = ({
     setIsShowModal(false);
   };
 
+  console.log({ isShowDropdown, isShowModal });
+
   return (
     <>
-    <div className='space-y-6'>
-      <div className="flex justify-between relative">
-        <h2>{task?.title}</h2>
-        <img
-        onClick={() => setIsShowDropdown(true)}
-          className="w-[4.6px] h-[20px]"
-          src="./imgs/icon-vertical-ellipsis.svg"
-          alt=""
-        />
-        {isShowDropdown && (
-          <Dropdown data={EditAndDelTask} setIsShowDropdown={setIsShowDropdown} setIsShowModal={[setIsShowEditTask, setIsShowDelTask]} />
-        )}
-      </div>
-      <p className="text-grey">{task?.desc}</p>
-      <div className="space-y-4">
-        <h4 className="text-grey">
-          Subtasks ({countSubtaskDone(task.subtasks)} of {task.subtasks.length})
-        </h4>
-        <div className="space-y-2">
-          {task?.subtasks?.map((sub) => (
-            <div
-              className="flex items-center gap-x-4 p-3 rounded-[4px] bg-light-grey"
-              key={sub.id}
-            >
-              <Checkbox
-                checked={sub.isDone}
-                onCheckedChange={() => handleCheck(sub.id)}
-              />
-              <h4
-                className={`${
-                  sub.isDone ? "line-through opacity-50" : "text-black"
-                }`}
+      <div className="space-y-6">
+        <div className="flex justify-between items-center relative">
+          <h2 className="truncate dark:text-white">{task?.title}</h2>
+          <div
+            onClick={() => setIsShowDropdown(!isShowDropdown)}
+            className="p-2 rounded-[4px] cursor-pointer dark:hover:bg-very-dark-grey hover:bg-light-grey transition-colors duration-200"
+          >
+            <img
+              className="w-[4.6px] h-[20px]"
+              src="./imgs/icon-vertical-ellipsis.svg"
+              alt="dropdown"
+            />
+          </div>
+          {isShowDropdown && (
+            <Dropdown
+              customStyle="right-0 top-10"
+              data={EditAndDelTask}
+              setIsShowDropdown={setIsShowDropdown}
+              setIsShowModal={[...setStates]}
+            />
+          )}
+        </div>
+        <p className="text-grey">{task?.desc}</p>
+        <div className="space-y-4">
+          <h4 className="text-grey dark:text-white">
+            Subtasks ({countSubtaskDone(task.subtasks)} of{" "}
+            {task.subtasks.length})
+          </h4>
+          <div className="space-y-2">
+            {task?.subtasks?.map((sub) => (
+              <div
+                className="flex items-center gap-x-4 p-3 rounded-[4px] dark:bg-very-dark-grey bg-light-grey"
+                key={sub.id}
               >
-                {sub.title}
-              </h4>
-            </div>
-          ))}
+                <Checkbox
+                  checked={sub.isDone}
+                  onCheckedChange={() => handleCheck(sub.id)}
+                />
+                <h4
+                  className={`${
+                    sub.isDone
+                      ? "line-through opacity-50 dark:text-white"
+                      : "text-black dark:text-white"
+                  }`}
+                >
+                  {sub.title}
+                </h4>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h4 className="text-grey dark:text-white">Current Status</h4>
+          <Select
+            // defaultValue={boards && boards?.columns[0].name}
+            value={task.status}
+            onValueChange={(value) => changeStatus(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select the status of the task" />
+            </SelectTrigger>
+            <SelectContent>
+              {currentBoard?.columns.map((column) => (
+                <SelectItem key={column.id} value={column.name}>
+                  {column.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
-      <div className="space-y-2">
-        <h4 className="text-grey">Current Status</h4>
-        <Select
-          // defaultValue={boards && boards?.columns[0].name}
-          value={task.status}
-          onValueChange={(value) => changeStatus(value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select the status of the task" />
-          </SelectTrigger>
-          <SelectContent>
-            {boards[boardId].columns.map((column) => (
-              <SelectItem key={column.id} value={column.name}>
-                {column.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-    {isShowEditTask && (
-        // <Modal
-        //   setIsShowModal={setIsShowEditTask}
-        //   childComp={
-        //     <EditBoard
-        //       currentBoard={board}
-        //       setIsShowModal={setIsShowEditBoard}
-        //     />
-        //   }
-        // />
-        null
-      )}
-      {isShowDelTask && (
-        <Modal
-          setIsShowModal={setIsShowDelTask}
-          childComp={
-            <DeleteModal
-              boardId={boardId}
-              columnId={columnId}
-              taskId={task.id}
-              setIsShowModal={setIsShowDelTask}
-            />
-          }
-        />
-      )}
+
+      
     </>
   );
 };

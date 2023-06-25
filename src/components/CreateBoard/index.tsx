@@ -5,6 +5,7 @@ import { Button, Input, Label } from "../ui";
 import { useDispatch, useSelector } from "react-redux";
 import { createABoard } from "redux/boardSlice";
 import { Board } from "constants/board";
+import { useNavigate } from "react-router-dom";
 
 export const BoardSchema = z.object({
   id: z.number().optional(),
@@ -36,8 +37,11 @@ const CreateBoard = ({
   setIsShowModal,
 }: BoardFormProps) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const boardList: Board[] = useSelector((state: any) => state.boardStore.boards);
+  const boardList: Board[] = useSelector(
+    (state: any) => state.boardStore.boards
+  );
   console.log({ boardList });
 
   const {
@@ -57,23 +61,28 @@ const CreateBoard = ({
     name: "columns",
   });
 
+  // if boards doesn't have any elements, then id is 0
+  // if boards have elements, id is id of the last element add to 1
+  // > 0,
+
   onSubmit = (board: BoardForm) => {
-    dispatch(createABoard({ ...board, id: boardList?.length | 0 }));
-    console.log(board);
+    const id =
+      boardList.length > 0 ? boardList[boardList.length - 1].id + 1 : 0;
+    dispatch(createABoard({ ...board, id }));
+    console.log("create board ", { ...board, id });
     setIsShowModal(false);
+    // navigate to board is just created
+    navigate(`${id}`);
   };
 
   console.log({ errors });
 
   return (
-    <form
-    className="space-y-6"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <h2 className="">Add New Board</h2>
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <h2 className="dark:text-white">Add New Board</h2>
 
       <div className="space-y-2">
-        <Label className="text-sm font-bold" htmlFor="name">
+        <Label className="text-sm font-bold dark:text-white" htmlFor="name">
           Name
         </Label>
         <Input
@@ -88,34 +97,36 @@ const CreateBoard = ({
         )}
       </div>
 
-      <div >
-        <Label className="text-sm font-bold mb-2" htmlFor="columns">
+      <div>
+        <Label className="text-sm font-bold mb-2 dark:text-white" htmlFor="columns">
           Columns
         </Label>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-x-4 items-center">
-            <Input
-              {...register(`columns.${index}.name`)}
-              id="columns"
-              type="text"
-            />
-            <img
-              onClick={() => remove(index)}
-              className="w-4 h-4 cursor-pointer"
-              src="./imgs/icon-cross.svg"
-              alt="cross"
-            />
-          </div>
-        ))}
-        {errors.columns && (
-          <p className="text-red" role="alert">
-            The title of columns cannot be empty
-          </p>
-        )}
+        <div className="space-y-3">
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex gap-x-4 items-center">
+              <Input
+                {...register(`columns.${index}.name`)}
+                id="columns"
+                type="text"
+              />
+              <img
+                onClick={() => remove(index)}
+                className="w-4 h-4 cursor-pointer"
+                src="./imgs/icon-cross.svg"
+                alt="cross"
+              />
+            </div>
+          ))}
+          {errors.columns && (
+            <p className="text-red" role="alert">
+              The title of columns cannot be empty
+            </p>
+          )}
+        </div>
 
         <Button
           variant="secondary"
-          className="w-full"
+          className="w-full mt-3"
           onClick={() => append({ id: fields.length, name: "", tasks: [] })}
         >
           +Add New Columns

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateABoard } from "redux/boardSlice";
 import { BoardForm, BoardSchema } from "components/CreateBoard";
 import { Board } from "constants/board";
+import { useState } from "react";
 
 export type BoardFormProps = {
   onSubmit?: (task: BoardForm) => void;
@@ -14,7 +15,7 @@ export type BoardFormProps = {
   submittingText?: string;
   initialData?: Partial<BoardForm>;
   setIsShowModal: (value: boolean) => void;
-  currentBoard?: Board;
+  currentBoard: Board;
 };
 
 const EditBoard = ({
@@ -26,6 +27,12 @@ const EditBoard = ({
   const dispatch = useDispatch();
 
   console.log({ currentBoard });
+
+  const [colId, setColId] = useState(
+    currentBoard.columns.length > 0
+      ? currentBoard.columns[currentBoard.columns.length - 1].id + 1
+      : 0
+  );
 
   const boardList: Board[] = useSelector(
     (state: any) => state.boardStore.boards
@@ -49,7 +56,7 @@ const EditBoard = ({
   });
 
   onSubmit = (editedBoard: BoardForm) => {
-    console.log({ ...editedBoard });
+    console.log("edit board ", editedBoard);
     const data = { ...editedBoard, id: currentBoard?.id };
     console.log({ data });
     dispatch(
@@ -62,13 +69,11 @@ const EditBoard = ({
     setIsShowModal(false);
   };
 
-  console.log({ errors });
-
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      <h2 className="">Edit Board</h2>
+      <h2 className="dark:text-white">Edit Board</h2>
       <div className="space-y-2">
-        <Label className="text-sm font-bold" htmlFor="name">
+        <Label className="text-sm font-bold dark:text-white" htmlFor="name">
           Name
         </Label>
         <Input
@@ -84,7 +89,7 @@ const EditBoard = ({
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-bold" htmlFor="columns">
+        <Label className="text-sm font-bold dark:text-white" htmlFor="columns">
           Columns
         </Label>
         {fields.map((field, index) => (
@@ -111,15 +116,15 @@ const EditBoard = ({
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() =>
+          onClick={() => {
             append({
-              id:
-                currentBoard?.columns &&
-                currentBoard?.columns[currentBoard?.columns.length - 1].id + 1,
+              id: colId,
               name: "",
               tasks: [],
-            })
-          }
+            });
+            setColId((pre) => pre + 1);
+            console.log("added id: ", colId);
+          }}
         >
           +Add New Columns
         </Button>
