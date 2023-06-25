@@ -1,18 +1,14 @@
 import Modal from "../../components/Modal";
 import { useState } from "react";
 import { Button } from "components/ui";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CreateColumn from "components/CreateColumn";
-import { useSelector } from "react-redux";
-import { Board } from "constants/board";
+import { useBoard } from "hooks/useBoard";
 
 const EmptyBoard = () => {
-  const { pathname } = useLocation();
-  const path = pathname.split("/")[1];
+  const { boardId } = useParams();
 
-  const boardList: Board[] = useSelector((state: any) => state.boardStore.boards)
-
-  const board = boardList[parseInt(path)]
+  const board = useBoard(parseInt(boardId!))
 
   const [isShowModal, setIsShowModal] = useState(false);
 
@@ -32,13 +28,10 @@ const EmptyBoard = () => {
           </Button>
         </section>
       </div>
-      {isShowModal && (
+      {isShowModal && board && (
         <Modal
           setIsShowModal={setIsShowModal}
           childComp={<CreateColumn board={board} setIsShowModal={setIsShowModal}/>}
-          customStyle={`-mt-[100px] ${
-            path !== "hide-sidebar" && "-ml-[300px]"
-          }`}
         />
       )}
     </>

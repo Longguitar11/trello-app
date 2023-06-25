@@ -13,7 +13,6 @@ const ColumnSchema = z.object({
 export type ColumnForm = z.infer<typeof ColumnSchema>;
 
 export type ColumnFormProps = {
-  onSubmit?: (task: ColumnForm) => void;
   mode?: "create" | "edit";
   submitting?: boolean;
   submitText?: string;
@@ -24,7 +23,6 @@ export type ColumnFormProps = {
 };
 
 const CreateColumn = ({
-  onSubmit,
   initialData = {},
   setIsShowModal,
   board,
@@ -41,7 +39,9 @@ const CreateColumn = ({
     defaultValues: initialData,
   });
 
-  onSubmit = (column: ColumnForm) => {
+  console.log("CreateColumn" , board)
+
+  const onSubmit = (column: ColumnForm) => {
     const result = {
       id: new Date().getTime(),
       ...column,

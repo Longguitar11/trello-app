@@ -30,7 +30,7 @@ const TaskColumn = () => {
 
   const board = useBoard(id)
 
-  console.log({
+  console.log("ahihjihiii", {
     board
   })
 

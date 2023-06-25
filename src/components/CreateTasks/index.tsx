@@ -192,7 +192,7 @@ const CreateTask = ({
               </SelectTrigger>
               <SelectContent>
                 {board?.columns.map((column) => (
-                  <SelectItem key={column.id} value={column.name}>
+                  <SelectItem key={column.id} value={column.id.toString()}>
                     {column.name}
                   </SelectItem>
                 ))}

@@ -55,7 +55,7 @@ const getInitialState = () => {
 
     console.log(JSON.parse(savedState || ""))
 
-    return savedState ? JSON.parse(savedState) : defaultState
+    return savedState ? JSON.parse(savedState) as AppStore : defaultState
   } catch {
     return defaultState
   }
@@ -70,13 +70,29 @@ const appSlice = createSlice({
       // add to task store
       state.tasks[action.payload.id] = action.payload
 
+      console.log(action.payload, state.columns)
       // get column
       const column = state.columns[parseInt(action.payload.status)]
       
+      console.log(column)
       // add task id to column
       column?.taskIds.push(action.payload.id)
     },
     updateTask: (state, action: PayloadAction<Task>) => {
+      const oldColumnId = state.tasks[action.payload.id].status;
+      
+      if (action.payload.status !== oldColumnId) {
+        // remove from old column
+        const oldColumn = state.columns[parseInt(oldColumnId)]
+
+        oldColumn.taskIds = oldColumn.taskIds.filter(id => id !== action.payload.id)
+
+        // add to new column
+        const newColumn = state.columns[parseInt(action.payload.status)]
+
+        newColumn.taskIds.push(action.payload.id)
+      }
+      
       // set to task store
       state.tasks[action.payload.id] = action.payload
     },
