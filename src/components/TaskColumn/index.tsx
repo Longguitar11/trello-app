@@ -4,15 +4,14 @@ import DeleteModal from "components/DeleteModal";
 import EditTask from "components/EditTask";
 import Modal from "components/Modal";
 import ViewTask from "components/ViewTask";
-import { Board } from "constants/board";
 import { colors } from "constants/color";
 import { Task } from "constants/task";
 import EmptyBoard from "pages/EmptyBoard";
 import { useHidden } from "pages/Layout";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import './style.css'
+import { useBoard } from "hooks/useBoard";
 
 const TaskColumn = () => {
   const [isCreateColumnModal, setIsCreateColumnModal] = useState(false);
@@ -26,18 +25,14 @@ const TaskColumn = () => {
   // get a prop from context of Outlet
   const { isHidden } = useHidden();
 
-  let { boardId } = useParams();
+  const { boardId } = useParams();
   const id = parseInt(boardId!);
 
-  const boardList: Board[] = useSelector(
-    (state: any) => state.boardStore.boards
-  );
+  const board = useBoard(id)
 
-  // copy board
-  let boardCopied = [...boardList];
-
-  // find current board
-  const board = boardCopied.find((board) => board.id === id);
+  console.log({
+    board
+  })
 
   let selectedTask: Task = {
     desc: "",

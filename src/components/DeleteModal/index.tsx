@@ -3,7 +3,7 @@ import { Board } from "constants/board";
 import { Task } from "constants/task";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeABoard, removeATask } from "redux/boardSlice";
+import { removeABoard, removeATask } from "redux/boardSliceBackup";
 
 type DeleteModalProps = {
   currentBoard: Board;

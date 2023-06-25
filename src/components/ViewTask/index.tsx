@@ -12,7 +12,7 @@ import { EditAndDelTask } from "constants/dropdown";
 import { Subtask, Task } from "constants/task";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateABoard } from "redux/boardSlice";
+import { updateABoard } from "redux/boardSliceBackup";
 
 type ViewTaskProps = {
   task: Task;

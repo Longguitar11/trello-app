@@ -2,33 +2,24 @@ import {
   Outlet,
   useNavigate,
   useOutletContext,
-  useParams,
 } from "react-router-dom";
 import Header from "components/Header";
 import SideBar from "components/SideBar";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Board } from "constants/board";
 import "./style.css";
+import { useBoardList } from "hooks/useBoardList";
 
 type ContextType = { isHidden: boolean };
 
 const Layout = () => {
   const navigate = useNavigate();
-  const { boardId } = useParams();
-  const id = boardId && parseInt(boardId);
   const [isDark, setIsDark] = useState(
     localStorage.theme === "dark" ? true : false
   );
 
   const [isHidden, setIsHidden] = useState(false);
 
-  const boardList: Board[] = useSelector(
-    (state: any) => state.boardStore.boards
-  );
-
-  const board = boardList.filter((board) => board.id === id)[0];
-  console.log("layout board ", board);
+  const boardList = useBoardList()
 
   console.log({ boardList });
 
@@ -53,7 +44,6 @@ const Layout = () => {
         setIsDark={setIsDark}
       />
       <Header
-        currentBoard={board}
         boards={boardList}
         isHidden={isHidden}
         sideBarData={{

@@ -3,9 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Input, Label } from "../ui";
 import { useDispatch, useSelector } from "react-redux";
-import { createABoard } from "redux/boardSlice";
 import { Board } from "constants/board";
 import { useNavigate } from "react-router-dom";
+import { addBoard } from "redux/boardSlice";
+import { Columns } from "constants/columns";
 
 export const BoardSchema = z.object({
   id: z.number().optional(),
@@ -66,9 +67,15 @@ const CreateBoard = ({
   // > 0,
 
   onSubmit = (board: BoardForm) => {
-    const id =
-      boardList.length > 0 ? boardList[boardList.length - 1].id + 1 : 0;
-    dispatch(createABoard({ ...board, id }));
+    const id = new Date().getTime();
+
+    const newBoard: Board = {
+      id,
+      name: board.name,
+      columns: board.columns as Columns[],
+    }
+
+    dispatch(addBoard(newBoard));
     console.log("create board ", { ...board, id });
     setIsShowModal(false);
     // navigate to board is just created

@@ -1,94 +1,180 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Board } from "constants/board";
-import { Task } from "constants/task";
+import {
+  PayloadAction,
+  createSlice,
+} from '@reduxjs/toolkit'
+import { Board } from 'constants/board'
+import { Columns } from 'constants/columns'
+import { Task } from 'constants/task'
 
-const boards: Board[] = JSON.parse(localStorage.getItem("board")!) || [];
+type ColumnStore = Omit<Columns, 'tasks'> & {
+  taskIds: number[]
+}
 
-const boardSlice = createSlice({
-  name: "board",
-  initialState: { boards },
+type TaskStore = Record<string | number, Task>
+
+type BoardStore = Omit<Board, 'columns'> & {
+  columnIds: number[]
+}
+
+type AppStore = {
+  columns: Record<number, ColumnStore>
+  tasks: TaskStore
+  boards: {
+    ids: number[]
+    entities: Record<number, BoardStore>
+  }
+}
+
+// const addColumn = (state:WritableDraft<AppStore>, action: PayloadAction<{
+//   boardId: number,
+//   column: Omit<Columns, "tasks">
+// }>) => {
+//   // add to task store
+//   state.columns.entities.set(action.payload.column.id, {
+//     ...action.payload.column,
+//     taskIds: [],
+//   })
+
+//   // add column id to board
+//   const board = state.boards.entities.get(action.payload.boardId)
+//   board?.columnIds.push(action.payload.column.id)
+// }
+
+const defaultState: AppStore = {
+  boards: {
+    ids: [],
+    entities: {},
+  },
+  columns: {},
+  tasks: {},
+}
+
+const getInitialState = () => {
+  try {
+    const savedState = localStorage.getItem('board')
+
+    console.log(JSON.parse(savedState || ""))
+
+    return savedState ? JSON.parse(savedState) : defaultState
+  } catch {
+    return defaultState
+  }
+  
+}
+
+const appSlice = createSlice({
+  name: 'tasks',
+  initialState: getInitialState(),
   reducers: {
-    getboardsByBoardId: (state) => {
-      // filter
-      state.boards = [...state.boards];
+    addTask: (state, action: PayloadAction<Task>) => {
+      // add to task store
+      state.tasks[action.payload.id] = action.payload
+
+      // get column
+      const column = state.columns[parseInt(action.payload.status)]
+      
+      // add task id to column
+      column?.taskIds.push(action.payload.id)
     },
-    createABoard: (state, action) => {
-      state.boards = [...state.boards, action.payload];
-      localStorage.setItem("board", JSON.stringify(state.boards));
+    updateTask: (state, action: PayloadAction<Task>) => {
+      // set to task store
+      state.tasks[action.payload.id] = action.payload
     },
-    updateABoard: (state, action) => {
-      state.boards = [...action.payload];
-      localStorage.setItem("board", JSON.stringify(state.boards));
-    },
-    removeABoard: (state, action) => {
-      state.boards = state.boards.filter(
-        (board) => board.id !== action.payload.id
-      );
-      localStorage.setItem("board", JSON.stringify(state.boards));
-    },
-    updateATask: (
-      state,
-      action: PayloadAction<{ boardId: number; columnId: number; task: Task }>
-    ) => {
-      const {boardId, columnId, task} = action.payload
-      state.boards = state.boards.map((board) =>
-        board.id === boardId
-          ? {
-              ...board,
-              columns: board.columns.map((col) =>
-                col.id === columnId
-                  ? {
-                      ...col,
-                      tasks: col.tasks.map(t => t.id === task.id ? {...task} : t),
-                    }
-                  : col
-              ),
-            }
-          : board
-      );
-      console.log('edit task ', state.boards)
-      localStorage.setItem("board", JSON.stringify(state.boards));
-    },
-    removeATask: (
-      state,
-      action: PayloadAction<{
-        boardId?: number;
-        columnId?: number;
-        taskId?: number;
-      }>
-    ) => {
-      const { boardId, columnId, taskId } = action.payload;
-      state.boards = state.boards.map((board) =>
-        board.id === boardId
-          ? {
-              ...board,
-              columns: board.columns.map((col) =>
-                col.id === columnId
-                  ? {
-                      ...col,
-                      tasks: col.tasks.filter((task) => task.id !== taskId),
-                    }
-                  : col
-              ),
-            }
-          : board
-      );
-      localStorage.setItem("board", JSON.stringify(state.boards));
-    },
+    deleteTask: (state, action: PayloadAction<Task>) => {
+      // delete from task store
+      delete state.tasks[action.payload.id]
+
+      // get column
+      const column = state.columns[+action.payload.status]
     
-    removeAllBoard: (state) => {
-      state.boards = [];
-      localStorage.removeItem("board");
+      // remove task id from column
+      if (column) {
+        column.taskIds = column.taskIds.filter(id => id !== action.payload.id)
+      }
+    },
+    addColumn: (state, action: PayloadAction<{
+      boardId: number,
+      column: Omit<Columns, "tasks">
+    }>) => {
+      // add to task store
+      state.columns[action.payload.column.id] = {
+        ...action.payload.column,
+        taskIds: [],
+      }
+
+      // add column id to board
+      const board = state.boards.entities[action.payload.boardId]
+      board?.columnIds.push(action.payload.column.id)
+    },
+
+    addBoard: (state, action: PayloadAction<Board>) => {
+      // add columns
+      action.payload.columns.forEach(column => {
+        state.columns[column.id] = {
+          ...column,
+          taskIds: [],
+        }
+      })
+
+      // add to task store
+      state.boards.entities[action.payload.id] = {
+        ...action.payload,
+        columnIds: action.payload.columns.map(column => column.id),
+      }
+
+      // add board id
+      state.boards.ids.push(action.payload.id)
+    },
+    updateBoard: (state, action: PayloadAction<{
+      board: Board,
+      columns: Omit<Columns, "tasks">[]
+    }>) => {
+      // add columns
+      action.payload.columns.forEach(column => {
+        state.columns[column.id] = {
+          ...column,
+          taskIds: state.columns[column.id]?.taskIds || [],
+        }
+      })
+
+      // update to board store
+      state.boards.entities[action.payload.board.id] = {
+        ...action.payload.board,
+        columnIds: action.payload.columns.map(column => column.id),
+      }
+    },
+    deleteBoard: (state, action: PayloadAction<Board>) => {
+      // get board
+      const board = state.boards.entities[action.payload.id]
+
+      // loop though columnIds and delete tasks
+      board?.columnIds.forEach(columnId => {
+        const column = state.columns[columnId]
+        column?.taskIds.forEach(taskId => {
+          delete state.tasks[taskId]
+        })
+
+        // delete column
+        delete state.columns[columnId]
+      })
+
+      // delete board
+      delete state.boards.entities[action.payload.id]
+
+      // delete board id
+      state.boards.ids = state.boards.ids.filter(id => id !== action.payload.id)
     },
   },
-});
+})
 
 export const {
-  createABoard,
-  updateABoard,
-  removeABoard,
-  updateATask,
-  removeATask,
-  removeAllBoard,
-} = boardSlice.actions;
-export default boardSlice.reducer;
+  addTask,
+  updateTask,
+  deleteTask,
+  addColumn,
+  addBoard,
+  updateBoard,
+  deleteBoard,
+} = appSlice.actions
+
+export default appSlice.reducer

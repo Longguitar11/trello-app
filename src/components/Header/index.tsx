@@ -9,12 +9,13 @@ import MobileSideBar from "components/SideBar/MobileSideBar";
 import { Button } from "components/ui";
 import { Board } from "constants/board";
 import { EditAndDelBoard } from "constants/dropdown";
+import { useBoard } from "hooks/useBoard";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 type HeaderProps = {
   isHidden: boolean;
   boards: Board[];
-  currentBoard: Board;
   sideBarData: {
     setIsHidden: (value: boolean) => void;
     isHidden: boolean;
@@ -26,7 +27,6 @@ type HeaderProps = {
 const Header = ({
   isHidden,
   boards,
-  currentBoard,
   sideBarData,
 }: HeaderProps) => {
   const [isShowModal, setIsShowModal] = useState(false);
@@ -36,6 +36,10 @@ const Header = ({
   const [isChevron, setIsChevron] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [isShowCreateBoard, setIsShowCreateBoard] = useState(false);
+
+  const { boardId } = useParams();
+
+  const currentBoard = useBoard(boardId ? parseInt(boardId) : undefined);
 
   const clickDropdown = () => {
     if (currentBoard) setIsShowDropdown(!isShowDropdown);
@@ -53,6 +57,8 @@ const Header = ({
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  console.log(currentBoard)
 
   return (
     <>
@@ -136,7 +142,7 @@ const Header = ({
           </div>
         </div>
       </div>
-      {isShowModal && (
+      {isShowModal && currentBoard && (
         <Modal
           setIsShowModal={setIsShowModal}
           childComp={
@@ -144,7 +150,7 @@ const Header = ({
           }
         />
       )}
-      {isShowEditBoard && (
+      {isShowEditBoard && currentBoard && (
         <Modal
           setIsShowModal={setIsShowEditBoard}
           childComp={
@@ -155,7 +161,7 @@ const Header = ({
           }
         />
       )}
-      {isShowDelBoard && (
+      {isShowDelBoard && currentBoard && (
         <Modal
           setIsShowModal={setIsShowDelBoard}
           childComp={

@@ -2,9 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Input, Label } from "../ui";
-import { useDispatch, useSelector } from "react-redux";
-import { updateABoard } from "redux/boardSlice";
+import { useDispatch } from "react-redux";
 import { Board } from "constants/board";
+import { addColumn } from "redux/boardSlice";
 
 const ColumnSchema = z.object({
   name: z.string().min(1, { message: "Title of subtask cannot be empty" }),
@@ -31,10 +31,6 @@ const CreateColumn = ({
 }: ColumnFormProps) => {
   const dispatch = useDispatch();
 
-  const boardList: Board[] = useSelector(
-    (state: any) => state.boardStore?.boards
-  );
-
   const {
     handleSubmit,
     register,
@@ -47,10 +43,7 @@ const CreateColumn = ({
 
   onSubmit = (column: ColumnForm) => {
     const result = {
-      id:
-        board.columns.length > 0
-          ? board.columns[board.columns.length - 1].id + 1
-          : 0,
+      id: new Date().getTime(),
       ...column,
       tasks: [],
     };
@@ -59,16 +52,10 @@ const CreateColumn = ({
 
     // add task to redux
     dispatch(
-      updateABoard(
-        boardList.map((b) =>
-          b.id === board.id
-            ? {
-                ...b,
-                columns: [...b.columns, result],
-              }
-            : b
-        )
-      )
+      addColumn({
+        boardId: board.id,
+        column: result,
+      })
     );
 
     setIsShowModal(false);
@@ -85,6 +72,7 @@ const CreateColumn = ({
         </Label>
         <Input
           id="name"
+          autoFocus
           {...register("name", { required: true })}
           placeholder="e.g. Todo"
         />
