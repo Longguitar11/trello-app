@@ -42,12 +42,14 @@ const TaskColumn = () => {
     title: "",
   };
 
+  if (!board) return <div>Board not found</div>;
+
   return (
     <>
-      {board && board?.columns.length > 0 ? (
+      {board.columns.length > 0 ? (
         <>
           <div className="p-6 flex gap-x-6 whitespace-nowrap overflow-auto no-scrollbar">
-            {board?.columns?.map((column, index) => (
+            {board.columns?.map((column, index) => (
               <section key={column.id} className="w-[280px]">
                 <div className="flex items-center gap-x-3 mb-6">
                   <div
@@ -125,8 +127,7 @@ const TaskColumn = () => {
           setIsShowModal={setIsShowEditTask}
           childComp={
             <EditTask
-              board={board!}
-              boards={boardList}
+              board={board}
               columnId={ids.columnId}
               currentTask={selectedTask}
               setIsShowModal={setIsShowEditTask}
@@ -142,7 +143,7 @@ const TaskColumn = () => {
           setIsShowModal={setIsShowDelTask}
           childComp={
             <DeleteModal
-              currentBoard={board!}
+              currentBoard={board}
               columnId={ids.columnId}
               currentTask={selectedTask}
               setIsShowModal={setIsShowDelTask}

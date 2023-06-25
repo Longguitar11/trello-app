@@ -1,11 +1,9 @@
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Input, Label } from '../ui'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateABoard } from 'redux/boardSliceBackup'
+import { useDispatch } from 'react-redux'
 import { BoardForm, BoardSchema } from 'components/CreateBoard'
 import { Board } from 'constants/board'
-import { useState } from 'react'
 import { updateBoard } from 'redux/boardSlice'
 
 export type BoardFormProps = {
