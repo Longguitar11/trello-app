@@ -141,10 +141,7 @@ const appSlice = createSlice({
       // add board id
       state.boards.ids.push(action.payload.id)
     },
-    updateBoard: (state, action: PayloadAction<{
-      board: Board,
-      columns: Omit<Columns, "tasks">[]
-    }>) => {
+    updateBoard: (state, action: PayloadAction<Board>) => {
       // add columns
       action.payload.columns.forEach(column => {
         state.columns[column.id] = {
@@ -154,8 +151,8 @@ const appSlice = createSlice({
       })
 
       // update to board store
-      state.boards.entities[action.payload.board.id] = {
-        ...action.payload.board,
+      state.boards.entities[action.payload.id] = {
+        ...action.payload,
         columnIds: action.payload.columns.map(column => column.id),
       }
     },
