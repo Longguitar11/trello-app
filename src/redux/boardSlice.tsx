@@ -123,12 +123,33 @@ const appSlice = createSlice({
       board?.columnIds.push(action.payload.column.id)
     },
     
+    deleteColumn: (state, action: PayloadAction<{
+      boardId: number,
+      columnId: number,
+    }>) => {
+      const board = state.boards.entities[action.payload.boardId]
+
+      if (!board) return
+      board.columnIds = board.columnIds.filter(id => id !== action.payload.columnId)
+
+      // delete column
+      delete state.columns[action.payload.columnId]
+    },
+    
     updateColumnTaskIds: (state, action: PayloadAction<{
       columnId: number,
       taskIds: number[]
     }>) => {
       // update column taskIds
       state.columns[action.payload.columnId].taskIds = action.payload.taskIds
+    },
+
+    updateBoardColumnsOrder: (state, action: PayloadAction<{
+      boardId: number,
+      columnIds: number[]
+    }>) => {     
+      // update to board columns
+      state.boards.entities[action.payload.boardId].columnIds = action.payload.columnIds
     },
 
     addBoard: (state, action: PayloadAction<Board>) => {
@@ -164,6 +185,7 @@ const appSlice = createSlice({
         columnIds: action.payload.columns.map(column => column.id),
       }
     },
+    
     deleteBoard: (state, action: PayloadAction<Board>) => {
       // get board
       const board = state.boards.entities[action.payload.id]
@@ -177,13 +199,13 @@ const appSlice = createSlice({
 
         // delete column
         delete state.columns[columnId]
-      })
-
-      // delete board
-      delete state.boards.entities[action.payload.id]
+      })      
 
       // delete board id
       state.boards.ids = state.boards.ids.filter(id => id !== action.payload.id)
+
+      // delete board
+      delete state.boards.entities[action.payload.id]
     },
   },
 })
@@ -193,7 +215,9 @@ export const {
   updateTask,
   deleteTask,
   addColumn,
+  deleteColumn,
   updateColumnTaskIds,
+  updateBoardColumnsOrder,
   addBoard,
   updateBoard,
   deleteBoard,

@@ -13,8 +13,9 @@ import { useParams } from "react-router-dom";
 import './style.css'
 import { useBoard } from "hooks/useBoard";
 import { Items, MultipleContainers } from "components/DnD/MultipleContainers";
-import { updateColumnTaskIds } from "redux/boardSlice";
-import { useAppDispatch } from "hooks/redux";
+import { addColumn, deleteColumn, updateBoardColumnsOrder, updateColumnTaskIds } from "redux/boardSlice";
+import { useAppDispatch, useAppSelector } from "hooks/redux";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 
 
@@ -42,7 +43,7 @@ const TaskColumn = () => {
     board
   })
 
-  let selectedTask: Task = {
+  const selectedTask: Task = {
     desc: "",
     id: 0,
     status: "",
@@ -52,10 +53,12 @@ const TaskColumn = () => {
 
   if (!board) return <div>Board not found</div>;
 
-  const items = board?.columns.reduce((acc, column) => {
+  const items = board.columns.reduce((acc, column) => {
     acc[`Column-${column.id}`] = column.tasks.map((task) => task.id)
     return acc
-  }, {} as any)
+  }, {} as Items)
+
+  console.log({ items, board })
 
   const onItemsChange: React.Dispatch<React.SetStateAction<Items>> = (newItems) => {
     console.log(items);
@@ -72,9 +75,9 @@ const TaskColumn = () => {
     }
 
     // {
-    //   "Column-1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    //   "Column-2": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    //   "Column-3": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    //   "Column-1": [1, 2, 3]
+    //   "Column-2": [4]
+    //   "Column-3": [5]
     // }
 
     for (const columnId in tempItems) {
@@ -88,6 +91,35 @@ const TaskColumn = () => {
       }))
     }
 
+  }
+
+  const handleAddColumn = () => {
+    dispatch(addColumn({
+      boardId: board.id,
+      column: {
+        id: new Date().getTime(),
+        name: "haihihaa"
+      }
+    }))
+  }
+  const handleRemoveColumn = (columnId: number) => {
+    dispatch(deleteColumn({
+      boardId: board.id,
+      columnId
+    }))
+  }
+
+  const handleColumnOrderChange = (columnIds: UniqueIdentifier[]) => {
+    const newColumnIds = columnIds.map((columnIdString) => {
+      const [, columnId] = columnIdString.toString().split('-')
+
+      return parseInt(columnId)
+    })
+
+    dispatch(updateBoardColumnsOrder({
+      boardId: board.id,
+      columnIds: newColumnIds
+    }))
   }
 
   return (
@@ -140,6 +172,9 @@ const TaskColumn = () => {
             items={items}
             setItems={onItemsChange}
             board={board}
+            onAddColumn={handleAddColumn}
+            onDeleteColumn={handleRemoveColumn}
+            onColumnOrderChange={handleColumnOrderChange}
           />
 
           {/* Show Create Column Modal */}

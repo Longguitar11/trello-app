@@ -56,6 +56,9 @@ interface Props {
   cancelDrop?: CancelDrop;
   columns?: number;
   board: Board
+  onAddColumn: () => void;
+  onDeleteColumn: (columnId: number) => void;
+  onColumnOrderChange: (columnIds: UniqueIdentifier[]) => void;
   setItems: React.Dispatch<React.SetStateAction<Items>>;
   containerStyle?: React.CSSProperties;
   coordinateGetter?: KeyboardCoordinateGetter;
@@ -81,16 +84,16 @@ interface Props {
 }
 
 function getColor(id: UniqueIdentifier) {
-  switch (String(id)[0]) {
-    case 'A':
-      return '#7193f1';
-    case 'B':
-      return '#ffda6c';
-    case 'C':
-      return '#00bcd4';
-    case 'D':
-      return '#ef769f';
-  }
+    switch (String(id)[0]) {
+      case 'A':
+        return '#7193f1';
+      case 'B':
+        return '#ffda6c';
+      case 'C':
+        return '#00bcd4';
+      case 'D':
+        return '#ef769f';
+    }
 
   return undefined;
 }
@@ -108,11 +111,11 @@ function getColumnNameById(containerId: UniqueIdentifier, board: Board) {
 
 export function MultipleContainers({
   adjustScale = false,
-  itemCount = 3,
   cancelDrop,
   columns,
   board,
   setItems,
+  onColumnOrderChange,
   handle = false,
   items,
   containerStyle,
@@ -125,10 +128,16 @@ export function MultipleContainers({
   strategy = verticalListSortingStrategy,
   vertical = false,
   scrollable,
+  ...props
 }: Props) {
-  const [containers, setContainers] = useState(
-    Object.keys(items) as UniqueIdentifier[]
-  );
+  const containers = Object.keys(items)
+  const setContainers: React.Dispatch<React.SetStateAction<UniqueIdentifier[]>> = (updater) => {
+    if (typeof updater === 'function') {
+      onColumnOrderChange(updater(containers))
+    } else {
+      onColumnOrderChange(updater)
+    }
+  }
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
@@ -429,7 +438,7 @@ export function MultipleContainers({
           {minimal ? undefined : (
             <DroppableContainer
               id={PLACEHOLDER_ID}
-              disabled={isSortingContainer}
+              disabled={true}
               items={empty}
               onClick={handleAddColumn}
               placeholder
@@ -477,7 +486,7 @@ export function MultipleContainers({
   function renderContainerDragOverlay(containerId: UniqueIdentifier) {
     return (
       <Container
-        label={`Column ${containerId}`}
+        label={getColumnNameById(containerId,board)}
         columns={columns}
         style={{
           height: '100%',
@@ -509,21 +518,13 @@ export function MultipleContainers({
   }
 
   function handleRemove(containerID: UniqueIdentifier) {
-    setContainers((containers) =>
-      containers.filter((id) => id !== containerID)
-    );
+    const [, columnId] = containerID.toString().split('-')
+    props.onDeleteColumn(parseInt(columnId))
   }
 
   function handleAddColumn() {
-    const newContainerId = getNextContainerId();
-
-    unstable_batchedUpdates(() => {
-      setContainers((containers) => [...containers, newContainerId]);
-      setItems((items) => ({
-        ...items,
-        [newContainerId]: [],
-      }));
-    });
+    // add column
+    props.onAddColumn()
   }
 
   function getNextContainerId() {
