@@ -169,6 +169,7 @@ const TaskColumn = () => {
             }}
             itemCount={15}
             scrollable
+            handle
             items={items}
             setItems={onItemsChange}
             board={board}

@@ -1,45 +1,45 @@
-import React, {useEffect} from 'react';
-import classNames from 'clsx';
-import type {DraggableSyntheticListeners} from '@dnd-kit/core';
-import type {Transform} from '@dnd-kit/utilities';
+import React, { useEffect } from 'react'
+import classNames from 'clsx'
+import type { DraggableSyntheticListeners } from '@dnd-kit/core'
+import type { Transform } from '@dnd-kit/utilities'
 
-import {Handle, Remove} from './components';
+import { Handle, Remove } from './components'
 
-import styles from './Item.module.css';
-import Card from 'components/Card';
-import { useTask } from 'hooks/useTask';
+import styles from './Item.module.css'
+import Card from 'components/Card'
+import { useTask } from 'hooks/useTask'
 
 export interface Props {
-  dragOverlay?: boolean;
-  color?: string;
-  disabled?: boolean;
-  dragging?: boolean;
-  handle?: boolean;
-  handleProps?: any;
-  height?: number;
-  index?: number;
-  fadeIn?: boolean;
-  transform?: Transform | null;
-  listeners?: DraggableSyntheticListeners;
-  sorting?: boolean;
-  style?: React.CSSProperties;
-  transition?: string | null;
-  wrapperStyle?: React.CSSProperties;
-  value: string;
-  onRemove?(): void;
+  dragOverlay?: boolean
+  color?: string
+  disabled?: boolean
+  dragging?: boolean
+  handle?: boolean
+  handleProps?: any
+  height?: number
+  index?: number
+  fadeIn?: boolean
+  transform?: Transform | null
+  listeners?: DraggableSyntheticListeners
+  sorting?: boolean
+  style?: React.CSSProperties
+  transition?: string | null
+  wrapperStyle?: React.CSSProperties
+  value: string
+  onRemove?(): void
   renderItem?(args: {
-    dragOverlay: boolean;
-    dragging: boolean;
-    sorting: boolean;
-    index: number | undefined;
-    fadeIn: boolean;
-    listeners: DraggableSyntheticListeners;
-    ref: React.Ref<HTMLElement>;
-    style: React.CSSProperties | undefined;
-    transform: Props['transform'];
-    transition: Props['transition'];
-    value: Props['value'];
-  }): React.ReactElement;
+    dragOverlay: boolean
+    dragging: boolean
+    sorting: boolean
+    index: number | undefined
+    fadeIn: boolean
+    listeners: DraggableSyntheticListeners
+    ref: React.Ref<HTMLElement>
+    style: React.CSSProperties | undefined
+    transform: Props['transform']
+    transition: Props['transition']
+    value: Props['value']
+  }): React.ReactElement
 }
 
 export const Item = React.memo(
@@ -68,18 +68,18 @@ export const Item = React.memo(
       },
       ref
     ) => {
-      const task = useTask(+value);
+      const task = useTask(+value)
       useEffect(() => {
         if (!dragOverlay) {
-          return;
+          return
         }
 
-        document.body.style.cursor = 'grabbing';
+        document.body.style.cursor = 'grabbing'
 
         return () => {
-          document.body.style.cursor = '';
-        };
-      }, [dragOverlay]);
+          document.body.style.cursor = ''
+        }
+      }, [dragOverlay])
 
       if (!task) {
         return <div>Task not found</div>
@@ -146,10 +146,7 @@ export const Item = React.memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            <div className='shadow my-2'>
-              <Card task={task} onClick={() => {}}/>
-
-            </div>
+            <Card task={task} onClick={() => {}} />
 
             {/* <Card /> */}
             <span className={styles.Actions}>
@@ -160,7 +157,7 @@ export const Item = React.memo(
             </span>
           </div>
         </li>
-      );
+      )
     }
   )
-);
+)
