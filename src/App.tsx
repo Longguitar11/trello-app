@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
-import TaskColumn from "components/TaskColumn";
+import TaskColumn from "components/TaskColumn/animate";
 
 function App() {
   return (

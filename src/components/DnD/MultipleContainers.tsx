@@ -34,7 +34,7 @@ import {coordinateGetter as multipleContainersCoordinateGetter} from './multiple
 import {Item, Container} from './components';
 import type {Props as ItemProps} from './components/Item';
 
-import { createRange } from 'lib/createRange';
+
 import { SortableItem } from './SortableItem';
 import { DroppableContainer } from './DropableContainer';
 import { Board } from 'constants/board';
@@ -49,13 +49,14 @@ const dropAnimation: DropAnimation = {
   }),
 };
 
-type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
+export type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
 
 interface Props {
   adjustScale?: boolean;
   cancelDrop?: CancelDrop;
   columns?: number;
   board: Board
+  setItems: React.Dispatch<React.SetStateAction<Items>>;
   containerStyle?: React.CSSProperties;
   coordinateGetter?: KeyboardCoordinateGetter;
   getItemStyles?(args: {
@@ -69,7 +70,7 @@ interface Props {
   }): React.CSSProperties;
   wrapperStyle?(args: {index: number}): React.CSSProperties;
   itemCount?: number;
-  items?: Items;
+  items: Items;
   handle?: boolean;
   renderItem?: ItemProps['renderItem'];
   strategy?: SortingStrategy;
@@ -111,8 +112,9 @@ export function MultipleContainers({
   cancelDrop,
   columns,
   board,
+  setItems,
   handle = false,
-  items: initialItems,
+  items,
   containerStyle,
   coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
@@ -124,15 +126,6 @@ export function MultipleContainers({
   vertical = false,
   scrollable,
 }: Props) {
-  const [items, setItems] = useState<Items>(
-    () =>
-      initialItems ?? {
-        A: createRange(itemCount, (index) => `A${index + 1}`),
-        B: createRange(itemCount, (index) => `B${index + 1}`),
-        C: createRange(itemCount, (index) => `C${index + 1}`),
-        D: createRange(itemCount, (index) => `D${index + 1}`),
-      }
-  );
   const [containers, setContainers] = useState(
     Object.keys(items) as UniqueIdentifier[]
   );
@@ -462,7 +455,7 @@ export function MultipleContainers({
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
     return (
       <Item
-        value={id}
+        value={id.toString()}
         handle={handle}
         style={getItemStyles({
           containerId: findContainer(id) as UniqueIdentifier,
@@ -495,7 +488,7 @@ export function MultipleContainers({
         {items[containerId].map((item, index) => (
           <Item
             key={item}
-            value={item}
+            value={item.toString()}
             handle={handle}
             style={getItemStyles({
               containerId,

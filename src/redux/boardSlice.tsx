@@ -122,6 +122,14 @@ const appSlice = createSlice({
       const board = state.boards.entities[action.payload.boardId]
       board?.columnIds.push(action.payload.column.id)
     },
+    
+    updateColumnTaskIds: (state, action: PayloadAction<{
+      columnId: number,
+      taskIds: number[]
+    }>) => {
+      // update column taskIds
+      state.columns[action.payload.columnId].taskIds = action.payload.taskIds
+    },
 
     addBoard: (state, action: PayloadAction<Board>) => {
       // add columns
@@ -185,6 +193,7 @@ export const {
   updateTask,
   deleteTask,
   addColumn,
+  updateColumnTaskIds,
   addBoard,
   updateBoard,
   deleteBoard,

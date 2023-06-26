@@ -61,7 +61,7 @@ export function SortableItem({
   return (
     <Item
       ref={disabled ? undefined : setNodeRef}
-      value={id}
+      value={id.toString()}
       dragging={isDragging}
       sorting={isSorting}
       handle={handle}

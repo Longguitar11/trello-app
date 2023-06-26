@@ -7,6 +7,7 @@ import {Handle, Remove} from './components';
 
 import styles from './Item.module.css';
 import Card from 'components/Card';
+import { useTask } from 'hooks/useTask';
 
 export interface Props {
   dragOverlay?: boolean;
@@ -24,7 +25,7 @@ export interface Props {
   style?: React.CSSProperties;
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
-  value: React.ReactNode;
+  value: string;
   onRemove?(): void;
   renderItem?(args: {
     dragOverlay: boolean;
@@ -67,6 +68,7 @@ export const Item = React.memo(
       },
       ref
     ) => {
+      const task = useTask(+value);
       useEffect(() => {
         if (!dragOverlay) {
           return;
@@ -78,6 +80,10 @@ export const Item = React.memo(
           document.body.style.cursor = '';
         };
       }, [dragOverlay]);
+
+      if (!task) {
+        return <div>Task not found</div>
+      }
 
       return renderItem ? (
         renderItem({
@@ -141,7 +147,7 @@ export const Item = React.memo(
             tabIndex={!handle ? 0 : undefined}
           >
             <div className='shadow my-2'>
-              Item Id: {value}
+              <Card task={task} onClick={() => {}}/>
 
             </div>
 
