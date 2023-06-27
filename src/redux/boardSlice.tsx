@@ -25,21 +25,6 @@ type AppStore = {
   }
 }
 
-// const addColumn = (state:WritableDraft<AppStore>, action: PayloadAction<{
-//   boardId: number,
-//   column: Omit<Columns, "tasks">
-// }>) => {
-//   // add to task store
-//   state.columns.entities.set(action.payload.column.id, {
-//     ...action.payload.column,
-//     taskIds: [],
-//   })
-
-//   // add column id to board
-//   const board = state.boards.entities.get(action.payload.boardId)
-//   board?.columnIds.push(action.payload.column.id)
-// }
-
 const defaultState: AppStore = {
   boards: {
     ids: [],
