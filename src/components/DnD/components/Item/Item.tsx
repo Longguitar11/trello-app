@@ -192,34 +192,34 @@ export const Item = React.memo(
             />
           )}
           {isShowEditTask && (
-        <Modal
-          setIsShowModal={setIsShowEditTask}
-          childComp={
-            <EditTask
-              board={board!}
-              columnId={parseInt(columnId!)}
-              currentTask={task}
+            <Modal
               setIsShowModal={setIsShowEditTask}
-              setIsShowParModal={setIsViewTask}
+              childComp={
+                <EditTask
+                  board={board!}
+                  columnId={parseInt(columnId!)}
+                  currentTask={task}
+                  setIsShowModal={setIsShowEditTask}
+                  setIsShowParModal={setIsViewTask}
+                />
+              }
             />
-          }
-          />
-      )}
+          )}
 
-      {isShowDelTask && (
-        <Modal
-          setIsShowModal={setIsShowDelTask}
-          childComp={
-            <DeleteModal
-              currentBoard={board!}
-              columnId={parseInt(columnId!)}
-              currentTask={task}
+          {isShowDelTask && (
+            <Modal
               setIsShowModal={setIsShowDelTask}
-              setIsShowParModal={setIsViewTask}
+              childComp={
+                <DeleteModal
+                  currentBoard={board!}
+                  columnId={parseInt(columnId!)}
+                  currentTask={task}
+                  setIsShowModal={setIsShowDelTask}
+                  setIsShowParModal={setIsViewTask}
+                />
+              }
             />
-          }
-          />
-      )}
+          )}
         </>
       );
     }
