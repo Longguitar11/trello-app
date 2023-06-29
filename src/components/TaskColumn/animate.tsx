@@ -1,24 +1,24 @@
-import Card from "components/Card";
 import CreateColumn from "components/CreateColumn";
 import DeleteModal from "components/DeleteModal";
 import EditTask from "components/EditTask";
 import Modal from "components/Modal";
 import ViewTask from "components/ViewTask";
-import { colors } from "constants/color";
 import { Task } from "constants/task";
 import EmptyBoard from "pages/EmptyBoard";
 import { useHidden } from "pages/Layout";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import './style.css'
+import "./style.css";
 import { useBoard } from "hooks/useBoard";
 import { Items, MultipleContainers } from "components/DnD/MultipleContainers";
-import { addColumn, deleteColumn, updateBoardColumnsOrder, updateColumnTaskIds } from "redux/boardSlice";
-import { useAppDispatch, useAppSelector } from "hooks/redux";
+import {
+  addColumn,
+  deleteColumn,
+  updateBoardColumnsOrder,
+  updateColumnTaskIds,
+} from "redux/boardSlice";
+import { useAppDispatch } from "hooks/redux";
 import { UniqueIdentifier } from "@dnd-kit/core";
-
-
-
 
 const TaskColumn = () => {
   const [isCreateColumnModal, setIsCreateColumnModal] = useState(false);
@@ -35,13 +35,13 @@ const TaskColumn = () => {
   const { boardId } = useParams();
   const id = parseInt(boardId!);
 
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const board = useBoard(id)
+  const board = useBoard(id);
 
   console.log("ahihjihiii", {
-    board
-  })
+    board,
+  });
 
   const selectedTask: Task = {
     desc: "",
@@ -54,22 +54,21 @@ const TaskColumn = () => {
   if (!board) return <div>Board not found</div>;
 
   const items = board.columns.reduce((acc, column) => {
-    acc[`Column-${column.id}`] = column.tasks.map((task) => task.id)
-    return acc
-  }, {} as Items)
+    acc[`Column-${column.id}`] = column.tasks.map((task) => task.id);
+    return acc;
+  }, {} as Items);
 
-  console.log({ items, board })
+  console.log({ items, board });
 
-  const onItemsChange: React.Dispatch<React.SetStateAction<Items>> = (newItems) => {
+  const onItemsChange: React.Dispatch<React.SetStateAction<Items>> = (
+    newItems
+  ) => {
     console.log(items);
 
     let tempItems: Items = {};
 
-    // setItems(updater: items => newItems)
-    // updater()
-
-    if (typeof newItems === 'function') {
-      tempItems = newItems(items)
+    if (typeof newItems === "function") {
+      tempItems = newItems(items);
     } else {
       tempItems = newItems;
     }
@@ -81,53 +80,51 @@ const TaskColumn = () => {
     // }
 
     for (const columnId in tempItems) {
-      const taskIds = tempItems[columnId].map((taskId) => parseInt(taskId.toString()))
-      const [, columnIdNumber] = columnId.split('-')
-      
+      const taskIds = tempItems[columnId].map((taskId) =>
+        parseInt(taskId.toString())
+      );
+      const [, columnIdNumber] = columnId.split("-");
+
       // update column tasks in redux
-      dispatch(updateColumnTaskIds({
-        columnId: parseInt(columnIdNumber),
-        taskIds,
-      }))
+      dispatch(
+        updateColumnTaskIds({
+          columnId: parseInt(columnIdNumber),
+          taskIds,
+        })
+      );
     }
+  };
 
-  }
-
-  const handleAddColumn = () => {
-    dispatch(addColumn({
-      boardId: board.id,
-      column: {
-        id: new Date().getTime(),
-        name: "haihihaa"
-      }
-    }))
-  }
   const handleRemoveColumn = (columnId: number) => {
-    dispatch(deleteColumn({
-      boardId: board.id,
-      columnId
-    }))
-  }
+    dispatch(
+      deleteColumn({
+        boardId: board.id,
+        columnId,
+      })
+    );
+  };
 
   const handleColumnOrderChange = (columnIds: UniqueIdentifier[]) => {
     const newColumnIds = columnIds.map((columnIdString) => {
-      const [, columnId] = columnIdString.toString().split('-')
+      const [, columnId] = columnIdString.toString().split("-");
 
-      return parseInt(columnId)
-    })
+      return parseInt(columnId);
+    });
 
-    dispatch(updateBoardColumnsOrder({
-      boardId: board.id,
-      columnIds: newColumnIds
-    }))
-  }
+    dispatch(
+      updateBoardColumnsOrder({
+        boardId: board.id,
+        columnIds: newColumnIds,
+      })
+    );
+  };
 
   return (
     <>
       {board.columns.length > 0 ? (
         <>
-          {/* <div className="p-6 flex gap-x-6 whitespace-nowrap overflow-auto no-scrollbar">
-            {board.columns?.map((column, index) => (
+          <div className="p-6 flex gap-x-6 whitespace-nowrap overflow-auto no-scrollbar">
+            {/*   {board.columns?.map((column, index) => (
               <section key={column.id} className="w-[280px]">
                 <div className="flex items-center gap-x-3 mb-6">
                   <div
@@ -160,23 +157,22 @@ const TaskColumn = () => {
               className="flex w-[280px] mb-[50px] dark:bg-dark-grey bg-[#e9effa] bg-opacity-50 cursor-pointer rounded-[6px] text-grey hover:text-purple transition-colors duration-200"
             >
               <h1 className="m-auto">+ New Column</h1>
-            </div>
-          </div> */}
+                </div> */}
 
-          <MultipleContainers
-            containerStyle={{
-              maxHeight: '80vh',
-            }}
-            itemCount={15}
-            scrollable
-            handle
-            items={items}
-            setItems={onItemsChange}
-            board={board}
-            onAddColumn={handleAddColumn}
-            onDeleteColumn={handleRemoveColumn}
-            onColumnOrderChange={handleColumnOrderChange}
-          />
+            <MultipleContainers
+              // containerStyle={{
+              //   minWidth: '280px'
+              // }}
+              itemCount={15}
+              scrollable
+              handle
+              items={items}
+              setItems={onItemsChange}
+              board={board}
+              onDeleteColumn={handleRemoveColumn}
+              onColumnOrderChange={handleColumnOrderChange}
+            />
+          </div>
 
           {/* Show Create Column Modal */}
           {isCreateColumnModal && (
@@ -188,7 +184,9 @@ const TaskColumn = () => {
                   setIsShowModal={setIsCreateColumnModal}
                 />
               }
-              customStyle={`ta:-mt-[100px] -mt-[80px] ${!isHidden && "ta:-ml-[300px] -ml-[260px]"}`}
+              customStyle={`ta:-mt-[100px] -mt-[80px] ${
+                !isHidden && "ta:-ml-[300px] -ml-[260px]"
+              }`}
             />
           )}
 
@@ -207,7 +205,9 @@ const TaskColumn = () => {
                   currentBoard={board}
                 />
               }
-              customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${!isHidden && "ta:-ml-[300px] mo:-ml-[260px]"}`}
+              customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${
+                !isHidden && "ta:-ml-[300px] mo:-ml-[260px]"
+              }`}
             />
           )}
         </>
@@ -227,8 +227,10 @@ const TaskColumn = () => {
               setIsShowParModal={setIsViewTaskModal}
             />
           }
-          customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${!isHidden && "ta:-ml-[300px] mo:-ml-[260px]"}`}
-          />
+          customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${
+            !isHidden && "ta:-ml-[300px] mo:-ml-[260px]"
+          }`}
+        />
       )}
 
       {isShowDelTask && (
@@ -243,8 +245,10 @@ const TaskColumn = () => {
               setIsShowParModal={setIsViewTaskModal}
             />
           }
-          customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${!isHidden && "ta:-ml-[300px] mo:-ml-[260px]"}`}
-          />
+          customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${
+            !isHidden && "ta:-ml-[300px] mo:-ml-[260px]"
+          }`}
+        />
       )}
     </>
   );

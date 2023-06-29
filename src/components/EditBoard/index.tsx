@@ -43,9 +43,7 @@ const EditBoard = ({
   })
 
   onSubmit = (editedBoard: BoardForm) => {
-    console.log('edit board ', editedBoard)
     const data = { ...editedBoard, id: currentBoard.id } as Board
-    console.log({ data })
     dispatch(updateBoard(data))
     setIsShowModal(false)
   }

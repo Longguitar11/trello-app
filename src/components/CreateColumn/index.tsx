@@ -5,6 +5,7 @@ import { Button, Input, Label } from "../ui";
 import { useDispatch } from "react-redux";
 import { Board } from "constants/board";
 import { addColumn } from "redux/boardSlice";
+import { Columns } from "constants/columns";
 
 const ColumnSchema = z.object({
   name: z.string().min(1, { message: "Title of subtask cannot be empty" }),
@@ -46,7 +47,7 @@ const CreateColumn = ({
       id: new Date().getTime(),
       ...column,
       tasks: [],
-    };
+    } as Columns;
 
     console.log("create column ", result);
 

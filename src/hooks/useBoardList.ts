@@ -20,6 +20,8 @@ export const useBoardList = () => useAppSelector(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const task = state.boardStore.tasks[taskId]
 
+            console.log('useBoardList task ', task)
+
             return {
               id: task.id,
               title: task.title,

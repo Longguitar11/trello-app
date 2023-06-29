@@ -56,13 +56,7 @@ const CreateTask = ({
 }: TaskFormProps) => {
   const dispatch = useDispatch()
 
-  console.log('board in create task ', board)
-
-  console.log('rerender')
-
   const [subtaskId, setSubtaskId] = useState(0)
-
-  console.log('current subtask id ', subtaskId)
 
   const {
     handleSubmit,

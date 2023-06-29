@@ -14,6 +14,7 @@ import { Board } from 'constants/board'
 import { TaskForm, TaskSchema } from 'components/CreateTasks'
 import { Task } from 'constants/task'
 import { updateTask } from 'redux/boardSlice'
+import { useEffect } from 'react'
 
 export type EditTaskFormProps = {
   onSubmit?: (task: TaskForm) => void
@@ -39,6 +40,7 @@ const EditTask = ({
     status: currentTask?.status,
   },
   setIsShowModal,
+  setIsShowParModal,
   board,
 }: EditTaskFormProps) => {
   const dispatch = useDispatch()
@@ -70,6 +72,16 @@ const EditTask = ({
     dispatch(updateTask(output))
     setIsShowModal(false)
   }
+
+  useEffect(() => {
+    setIsShowParModal(false)
+  
+    return () => {
+      setIsShowParModal(true)
+
+    }
+  }, [])
+  
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>

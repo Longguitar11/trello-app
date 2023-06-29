@@ -134,7 +134,7 @@ const CreateBoard = ({
         <Button
           variant="secondary"
           className="w-full mt-3"
-          onClick={() => append({ id: fields.length, name: "", tasks: [] })}
+          onClick={() => append({ id: new Date().getTime(), name: "", tasks: [] })}
         >
           +Add New Columns
         </Button>

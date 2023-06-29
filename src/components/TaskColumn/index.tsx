@@ -95,7 +95,6 @@ const TaskColumn = () => {
                   setIsShowModal={setIsCreateColumnModal}
                 />
               }
-              customStyle={`ta:-mt-[100px] -mt-[80px] ${!isHidden && "ta:-ml-[300px] -ml-[260px]"}`}
             />
           )}
 
@@ -114,7 +113,6 @@ const TaskColumn = () => {
                   currentBoard={board}
                 />
               }
-              customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${!isHidden && "ta:-ml-[300px] mo:-ml-[260px]"}`}
             />
           )}
         </>
@@ -134,7 +132,6 @@ const TaskColumn = () => {
               setIsShowParModal={setIsViewTaskModal}
             />
           }
-          customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${!isHidden && "ta:-ml-[300px] mo:-ml-[260px]"}`}
           />
       )}
 
@@ -150,7 +147,6 @@ const TaskColumn = () => {
               setIsShowParModal={setIsViewTaskModal}
             />
           }
-          customStyle={`ta:-mt-[100px] mo:-mt-[80px] -mt-16 ${!isHidden && "ta:-ml-[300px] mo:-ml-[260px]"}`}
           />
       )}
     </>

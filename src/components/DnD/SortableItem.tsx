@@ -3,6 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { useMountStatus } from "hooks/useMountStatus";
 import { Item } from "./components";
 import { Props } from "./components/Item/Item";
+import { Board } from "constants/board";
 
 interface SortableItemProps {
   containerId: UniqueIdentifier;
@@ -12,20 +13,21 @@ interface SortableItemProps {
   disabled?: boolean;
   style(args: any): React.CSSProperties;
   getIndex(id: UniqueIdentifier): number;
-  renderItem: Props['renderItem']
-  wrapperStyle({index}: {index: number}): React.CSSProperties;
+  renderItem: Props["renderItem"];
+  wrapperStyle({ index }: { index: number }): React.CSSProperties;
+  board: Board
 }
 
 function getColor(id: UniqueIdentifier) {
   switch (String(id)[0]) {
-    case 'A':
-      return '#7193f1';
-    case 'B':
-      return '#ffda6c';
-    case 'C':
-      return '#00bcd4';
-    case 'D':
-      return '#ef769f';
+    case "A":
+      return "#7193f1";
+    case "B":
+      return "#ffda6c";
+    case "C":
+      return "#00bcd4";
+    case "D":
+      return "#ef769f";
   }
 
   return undefined;
@@ -41,6 +43,7 @@ export function SortableItem({
   containerId,
   getIndex,
   wrapperStyle,
+  board
 }: SortableItemProps) {
   const {
     setNodeRef,
@@ -65,9 +68,9 @@ export function SortableItem({
       dragging={isDragging}
       sorting={isSorting}
       handle={handle}
-      handleProps={handle ? {ref: setActivatorNodeRef} : undefined}
+      handleProps={handle ? { ref: setActivatorNodeRef } : undefined}
       index={index}
-      wrapperStyle={wrapperStyle({index})}
+      wrapperStyle={wrapperStyle({ index })}
       style={style({
         index,
         value: id,
@@ -82,7 +85,8 @@ export function SortableItem({
       fadeIn={mountedWhileDragging}
       listeners={listeners}
       renderItem={renderItem}
+      containerId={containerId}
+      board={board}
     />
   );
 }
-

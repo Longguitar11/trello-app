@@ -1,9 +1,10 @@
 import { Button } from "components/ui";
 import { Board } from "constants/board";
 import { Task } from "constants/task";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeABoard, removeATask } from "redux/boardSliceBackup";
+import { deleteBoard, deleteTask } from "redux/boardSlice";
 
 type DeleteModalProps = {
   currentBoard: Board;
@@ -11,7 +12,7 @@ type DeleteModalProps = {
   currentTask?: Task;
   boards?: Board[];
   setIsShowModal: (value: boolean) => void;
-  setIsShowParModal?: (value: boolean) => void;
+  setIsShowParModal: (value: boolean) => void;
 };
 
 const DeleteModal = ({
@@ -27,18 +28,17 @@ const DeleteModal = ({
 
   const handleDelete = () => {
     // delete board
-    if (
-      typeof currentBoard.id === "number" &&
-      currentBoard.id >= 0 &&
-      !columnId &&
-      !currentTask
-    ) {
-      dispatch(removeABoard({ id: currentBoard.id }));
+    if (!columnId && !currentTask) {
+      dispatch(deleteBoard(currentBoard));
       console.log("delete board: ", boards);
       if (boards && boards?.length > 1 && boards[0].id !== currentBoard.id) {
         console.log("navigate to first board");
         navigate(`${boards[0].id}`);
-      } else if (boards && boards[0].id === currentBoard.id) {
+      } else if (
+        boards &&
+        boards?.length > 1 &&
+        boards[0].id === currentBoard.id
+      ) {
         console.log("navigate to second board");
         navigate(`${boards[1].id}`);
       } else {
@@ -49,22 +49,26 @@ const DeleteModal = ({
     // delete task
     else {
       console.log("delete task");
-      dispatch(
-        removeATask({
-          boardId: currentBoard.id,
-          columnId,
-          taskId: currentTask?.id,
-        })
-      );
+      dispatch(deleteTask(currentTask!));
       setIsShowParModal && setIsShowParModal(false);
     }
 
     setIsShowModal(false);
   };
 
+  useEffect(() => {
+    setIsShowParModal(false);
+
+    return () => {
+      setIsShowParModal(true);
+    };
+  }, []);
+
   return (
     <div className="space-y-6">
-      <h2 className="dark:text-red">Delete this {currentTask ? 'task' : 'board'}</h2>
+      <h2 className="dark:text-red">
+        Delete this {currentTask ? "task" : "board"}
+      </h2>
       {!currentTask ? (
         <p className="text-grey">
           Are you sure you want to delete the {currentBoard?.name} board? This

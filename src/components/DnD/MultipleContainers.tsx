@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {createPortal, unstable_batchedUpdates} from 'react-dom';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal, unstable_batchedUpdates } from "react-dom";
 import {
   CancelDrop,
   closestCenter,
@@ -20,30 +20,31 @@ import {
   MeasuringStrategy,
   KeyboardCoordinateGetter,
   defaultDropAnimationSideEffects,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   SortableContext,
   arrayMove,
   verticalListSortingStrategy,
   SortingStrategy,
   horizontalListSortingStrategy,
-} from '@dnd-kit/sortable';
+} from "@dnd-kit/sortable";
 
-import {coordinateGetter as multipleContainersCoordinateGetter} from './multipleContainersKeyboardCoordinates';
+import { coordinateGetter as multipleContainersCoordinateGetter } from "./multipleContainersKeyboardCoordinates";
 
-import {Item, Container} from './components';
-import type {Props as ItemProps} from './components/Item';
+import { Item, Container } from "./components";
+import type { Props as ItemProps } from "./components/Item";
 
-
-import { SortableItem } from './SortableItem';
-import { DroppableContainer } from './DropableContainer';
-import { Board } from 'constants/board';
+import { SortableItem } from "./SortableItem";
+import { DroppableContainer } from "./DropableContainer";
+import { Board } from "constants/board";
+import Modal from "components/Modal";
+import CreateColumn from "components/CreateColumn";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
     styles: {
       active: {
-        opacity: '0.5',
+        opacity: "0.5",
       },
     },
   }),
@@ -55,8 +56,7 @@ interface Props {
   adjustScale?: boolean;
   cancelDrop?: CancelDrop;
   columns?: number;
-  board: Board
-  onAddColumn: () => void;
+  board: Board;
   onDeleteColumn: (columnId: number) => void;
   onColumnOrderChange: (columnIds: UniqueIdentifier[]) => void;
   setItems: React.Dispatch<React.SetStateAction<Items>>;
@@ -71,11 +71,11 @@ interface Props {
     isSorting: boolean;
     isDragOverlay: boolean;
   }): React.CSSProperties;
-  wrapperStyle?(args: {index: number}): React.CSSProperties;
+  wrapperStyle?(args: { index: number }): React.CSSProperties;
   itemCount?: number;
   items: Items;
   handle?: boolean;
-  renderItem?: ItemProps['renderItem'];
+  renderItem?: ItemProps["renderItem"];
   strategy?: SortingStrategy;
   modifiers?: Modifiers;
   minimal?: boolean;
@@ -84,29 +84,29 @@ interface Props {
 }
 
 function getColor(id: UniqueIdentifier) {
-    switch (String(id)[0]) {
-      case 'A':
-        return '#7193f1';
-      case 'B':
-        return '#ffda6c';
-      case 'C':
-        return '#00bcd4';
-      case 'D':
-        return '#ef769f';
-    }
+  switch (String(id)[0]) {
+    case "A":
+      return "#7193f1";
+    case "B":
+      return "#ffda6c";
+    case "C":
+      return "#00bcd4";
+    case "D":
+      return "#ef769f";
+  }
 
   return undefined;
 }
 
-const PLACEHOLDER_ID = 'placeholder';
+const PLACEHOLDER_ID = "placeholder";
 const empty: UniqueIdentifier[] = [];
 
 // Column-ID
 function getColumnNameById(containerId: UniqueIdentifier, board: Board) {
-  const [, columnId] = containerId.toString().split('-')
+  const [, columnId] = containerId.toString().split("-");
 
-  if (!columnId) return "Missing columnId"
-  return board.columns.find(column => column.id === parseInt(columnId))?.name
+  if (!columnId) return "Missing columnId";
+  return board.columns.find((column) => column.id === parseInt(columnId))?.name;
 }
 
 export function MultipleContainers({
@@ -130,18 +130,21 @@ export function MultipleContainers({
   scrollable,
   ...props
 }: Props) {
-  const containers = Object.keys(items)
-  const setContainers: React.Dispatch<React.SetStateAction<UniqueIdentifier[]>> = (updater) => {
-    if (typeof updater === 'function') {
-      onColumnOrderChange(updater(containers))
+  const containers = Object.keys(items);
+  const setContainers: React.Dispatch<
+    React.SetStateAction<UniqueIdentifier[]>
+  > = (updater) => {
+    if (typeof updater === "function") {
+      onColumnOrderChange(updater(containers));
     } else {
-      onColumnOrderChange(updater)
+      onColumnOrderChange(updater);
     }
-  }
+  };
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
   const isSortingContainer = activeId ? containers.includes(activeId) : false;
+  const [isShowColumnModal, setIsShowColumnModal] = useState(false);
 
   /**
    * Custom collision detection strategy optimized for multiple containers
@@ -169,7 +172,7 @@ export function MultipleContainers({
           ? // If there are droppables intersecting with the pointer, return those
             pointerIntersections
           : rectIntersection(args);
-      let overId = getFirstCollision(intersections, 'id');
+      let overId = getFirstCollision(intersections, "id");
 
       if (overId != null) {
         if (overId in items) {
@@ -191,7 +194,7 @@ export function MultipleContainers({
 
         lastOverId.current = overId;
 
-        return [{id: overId}];
+        return [{ id: overId }];
       }
 
       // When a draggable item moves to a new container, the layout may shift
@@ -203,7 +206,7 @@ export function MultipleContainers({
       }
 
       // If no droppable is matched, return the last match
-      return lastOverId.current ? [{id: lastOverId.current}] : [];
+      return lastOverId.current ? [{ id: lastOverId.current }] : [];
     },
     [activeId, items]
   );
@@ -261,11 +264,11 @@ export function MultipleContainers({
           strategy: MeasuringStrategy.Always,
         },
       }}
-      onDragStart={({active}) => {
+      onDragStart={({ active }) => {
         setActiveId(active.id);
         setClonedItems(items);
       }}
-      onDragOver={({active, over}) => {
+      onDragOver={({ active, over }) => {
         const overId = over?.id;
 
         if (overId == null || active.id in items) {
@@ -322,7 +325,7 @@ export function MultipleContainers({
           });
         }
       }}
-      onDragEnd={({active, over}) => {
+      onDragEnd={({ active, over }) => {
         if (active.id in items && over?.id) {
           setContainers((containers) => {
             const activeIndex = containers.indexOf(active.id);
@@ -388,11 +391,9 @@ export function MultipleContainers({
       modifiers={modifiers}
     >
       <div
+      className="inline-grid box-border "
         style={{
-          display: 'inline-grid',
-          boxSizing: 'border-box',
-          padding: 20,
-          gridAutoFlow: vertical ? 'row' : 'column',
+          gridAutoFlow: vertical ? "row" : "column",
         }}
       >
         <SortableContext
@@ -407,7 +408,9 @@ export function MultipleContainers({
             <DroppableContainer
               key={containerId}
               id={containerId}
-              label={minimal ? undefined : getColumnNameById(containerId,board)}
+              label={
+                minimal ? undefined : getColumnNameById(containerId, board)
+              }
               columns={columns}
               items={items[containerId]}
               scrollable={scrollable}
@@ -417,6 +420,7 @@ export function MultipleContainers({
             >
               <SortableContext items={items[containerId]} strategy={strategy}>
                 {items[containerId].map((value, index) => {
+
                   return (
                     <SortableItem
                       disabled={isSortingContainer}
@@ -429,6 +433,7 @@ export function MultipleContainers({
                       renderItem={renderItem}
                       containerId={containerId}
                       getIndex={getIndex}
+                      board={board}
                     />
                   );
                 })}
@@ -440,7 +445,7 @@ export function MultipleContainers({
               id={PLACEHOLDER_ID}
               disabled={true}
               items={empty}
-              onClick={handleAddColumn}
+              onClick={() => setIsShowColumnModal(true)}
               placeholder
             >
               + Add column
@@ -458,6 +463,15 @@ export function MultipleContainers({
         </DragOverlay>,
         document.body
       )}
+      {isShowColumnModal && (
+        <Modal
+          setIsShowModal={setIsShowColumnModal}
+          childComp={
+            <CreateColumn board={board} setIsShowModal={setIsShowColumnModal} />
+          }
+        />
+      )}
+      
     </DndContext>
   );
 
@@ -476,7 +490,7 @@ export function MultipleContainers({
           isDragOverlay: true,
         })}
         color={getColor(id)}
-        wrapperStyle={wrapperStyle({index: 0})}
+        wrapperStyle={wrapperStyle({ index: 0 })}
         renderItem={renderItem}
         dragOverlay
       />
@@ -486,10 +500,10 @@ export function MultipleContainers({
   function renderContainerDragOverlay(containerId: UniqueIdentifier) {
     return (
       <Container
-        label={getColumnNameById(containerId,board)}
+        label={getColumnNameById(containerId, board)}
         columns={columns}
         style={{
-          height: '100%',
+          height: "100%",
         }}
         shadow
         unstyled={false}
@@ -509,7 +523,7 @@ export function MultipleContainers({
               isDragOverlay: false,
             })}
             color={getColor(item)}
-            wrapperStyle={wrapperStyle({index})}
+            wrapperStyle={wrapperStyle({ index })}
             renderItem={renderItem}
           />
         ))}
@@ -518,13 +532,8 @@ export function MultipleContainers({
   }
 
   function handleRemove(containerID: UniqueIdentifier) {
-    const [, columnId] = containerID.toString().split('-')
-    props.onDeleteColumn(parseInt(columnId))
-  }
-
-  function handleAddColumn() {
-    // add column
-    props.onAddColumn()
+    const [, columnId] = containerID.toString().split("-");
+    props.onDeleteColumn(parseInt(columnId));
   }
 
   function getNextContainerId() {

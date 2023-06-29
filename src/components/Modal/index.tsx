@@ -5,7 +5,7 @@ export type ModalProps = {
   customStyle?: string;
 };
 
-const Modal: React.FC<ModalProps> = ({
+const Modal = ({
   setIsShowModal,
   childComp,
   customStyle,
