@@ -79,6 +79,7 @@ export const Item = React.memo(
       ref
     ) => {
       const task = useTask(+value);
+      // console.log({task})
 
       const columnId = containerId?.toString().split("-")[1];
       const [isViewTask, setIsViewTask] = useState(false);
@@ -157,7 +158,7 @@ export const Item = React.memo(
                   dragOverlay && styles.dragOverlay,
                   disabled && styles.disabled,
                   color && styles.color
-                ) + ` flex items-center`
+                ) + ` flex items-center w-[280px] rounded-[8px]`
               }
               style={style}
               data-cypress="draggable-item"
@@ -165,14 +166,16 @@ export const Item = React.memo(
               {...props}
               tabIndex={!handle ? 0 : undefined}
             >
-              <Card task={task} onClick={() => setIsViewTask(true)} />
-
-              <span className={styles.Actions}>
-                {onRemove ? (
-                  <Remove className={styles.Remove} onClick={onRemove} />
-                ) : null}
-                {handle ? <Handle {...handleProps} {...listeners} /> : null}
-              </span>
+              <Card task={task} onClick={() => setIsViewTask(true)}>
+                {
+                  <span className={styles.Actions}>
+                    {onRemove ? (
+                      <Remove className={styles.Remove} onClick={onRemove} />
+                    ) : null}
+                    {handle ? <Handle {...handleProps} {...listeners} /> : null}
+                  </span>
+                }
+              </Card>
             </div>
           </li>
           {isViewTask && (

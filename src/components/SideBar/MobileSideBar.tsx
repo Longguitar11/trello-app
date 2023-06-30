@@ -91,6 +91,7 @@ const MobileSideBar = ({
                   onClick={() => {
                     setIsSelected(index);
                     navigate(`${item.id}`);
+                    setIsChevron(false)
                   }}
                   className={`${
                     isSelected === item.id

@@ -1,8 +1,4 @@
-import {
-  Outlet,
-  useNavigate,
-  useOutletContext,
-} from "react-router-dom";
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import Header from "components/Header";
 import SideBar from "components/SideBar";
 import { useEffect, useState } from "react";
@@ -19,17 +15,12 @@ const Layout = () => {
 
   const [isHidden, setIsHidden] = useState(false);
 
-  const boardList = useBoardList()
-
-  console.log({ boardList });
+  const boardList = useBoardList();
 
   useEffect(() => {
-    console.log("layout");
     if (boardList.length > 0) {
-      console.log("navigate");
       navigate(`${boardList[0].id}`);
     } else {
-      console.log("navigate to home");
       navigate("/");
     }
   }, []);

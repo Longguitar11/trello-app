@@ -9,6 +9,7 @@ const animateLayoutChanges: AnimateLayoutChanges = (args) =>
 export function DroppableContainer({
   children,
   columns = 1,
+  tasklength,
   disabled,
   id,
   items,
@@ -44,6 +45,7 @@ export function DroppableContainer({
 
   return (
     <Container
+      tasklength={tasklength}
       ref={disabled ? undefined : setNodeRef}
       style={{
         ...style,

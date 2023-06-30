@@ -9,11 +9,17 @@ type SideBarProps = {
   setIsHidden: (isHidden: boolean) => void;
   isHidden: boolean;
   boards: Board[];
-  isDark: boolean
-  setIsDark: (value: boolean) => void
+  isDark: boolean;
+  setIsDark: (value: boolean) => void;
 };
 
-const SideBar = ({ setIsHidden, isHidden, boards, isDark, setIsDark}: SideBarProps) => {
+const SideBar = ({
+  setIsHidden,
+  isHidden,
+  boards,
+  isDark,
+  setIsDark,
+}: SideBarProps) => {
   const navigate = useNavigate();
   const { boardId } = useParams();
 
@@ -24,8 +30,6 @@ const SideBar = ({ setIsHidden, isHidden, boards, isDark, setIsDark}: SideBarPro
   );
 
   const [isShowModal, setIsShowModal] = useState(false);
-
-  console.log("side bar id state: ", isSelected);
 
   const hideSideBar = () => {
     setIsHidden(true);
@@ -38,10 +42,8 @@ const SideBar = ({ setIsHidden, isHidden, boards, isDark, setIsDark}: SideBarPro
   const checkSwitch = (check: boolean) => {
     // Whenever the user explicitly chooses light mode
     if (check) {
-      console.log("assign dark");
       localStorage.theme = "dark";
     } else {
-      console.log("assign light");
       localStorage.theme = "light";
     }
 
@@ -51,11 +53,11 @@ const SideBar = ({ setIsHidden, isHidden, boards, isDark, setIsDark}: SideBarPro
         window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       document.documentElement.classList.add("dark");
-      setIsDark(true)
+      setIsDark(true);
     } else {
       console.log("remove dark");
       document.documentElement.classList.remove("dark");
-      setIsDark(false)
+      setIsDark(false);
     }
 
     // localStorage.removeItem('theme')
@@ -77,7 +79,6 @@ const SideBar = ({ setIsHidden, isHidden, boards, isDark, setIsDark}: SideBarPro
       console.log("add dark");
       document.documentElement.classList.add("dark");
     } else {
-      console.log("remove dark");
       document.documentElement.classList.remove("dark");
     }
   }, []);

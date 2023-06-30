@@ -35,8 +35,6 @@ const getInitialState = () => {
   try {
     const savedState = localStorage.getItem("board");
 
-    console.log(JSON.parse(savedState || ""));
-
     return savedState ? (JSON.parse(savedState) as AppStore) : defaultState;
   } catch {
     return defaultState;
@@ -78,6 +76,7 @@ const appSlice = createSlice({
       state.tasks[action.payload.id] = action.payload;
     },
     deleteTask: (state, action: PayloadAction<Task>) => {
+      console.log("delete data ", action.payload);
       // delete from task store
       delete state.tasks[action.payload.id];
 
@@ -89,6 +88,8 @@ const appSlice = createSlice({
         column.taskIds = column.taskIds.filter(
           (id) => id !== action.payload.id
         );
+      } else {
+        console.log("cannot find the column");
       }
     },
     addColumn: (
@@ -135,6 +136,15 @@ const appSlice = createSlice({
     ) => {
       // update column taskIds
       state.columns[action.payload.columnId].taskIds = action.payload.taskIds;
+    },
+    updateTaskStatus: (
+      state,
+      action: PayloadAction<{
+        columnId: number;
+        taskId: number
+      }>
+    ) => {
+      state.tasks[action.payload.taskId].status = action.payload.columnId.toString();
     },
     updateBoardColumnsOrder: (
       state,
@@ -213,6 +223,7 @@ export const {
   addColumn,
   deleteColumn,
   updateColumnTaskIds,
+  updateTaskStatus,
   updateBoardColumnsOrder,
   addBoard,
   updateBoard,

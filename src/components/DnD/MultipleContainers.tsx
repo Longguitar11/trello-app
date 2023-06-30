@@ -81,6 +81,8 @@ interface Props {
   minimal?: boolean;
   scrollable?: boolean;
   vertical?: boolean;
+  activeId: UniqueIdentifier | null;
+  setActiveId: (value: UniqueIdentifier | null) => void;
 }
 
 function getColor(id: UniqueIdentifier) {
@@ -109,6 +111,28 @@ function getColumnNameById(containerId: UniqueIdentifier, board: Board) {
   return board.columns.find((column) => column.id === parseInt(columnId))?.name;
 }
 
+const getTaskLenthById = (containerId: UniqueIdentifier, board: Board) => {
+  const [, columnId] = containerId.toString().split("-");
+  if (!columnId) return -1;
+  else {
+    const column = board.columns.filter(
+      (col) => col.id === parseInt(columnId)
+    )[0];
+    return column.tasks.length;
+  }
+};
+
+const getColumnIndexById = (containerId: UniqueIdentifier, board: Board) => {
+  const [, columnId] = containerId.toString().split("-");
+  if (!columnId) return 0;
+  else {
+    const columnIndex = board.columns.findIndex(
+      (col) => col.id === parseInt(columnId)
+    );
+    return columnIndex;
+  }
+};
+
 export function MultipleContainers({
   adjustScale = false,
   cancelDrop,
@@ -128,8 +152,11 @@ export function MultipleContainers({
   strategy = verticalListSortingStrategy,
   vertical = false,
   scrollable,
+  activeId,
+  setActiveId,
   ...props
 }: Props) {
+  // containers = ['Column-1', 'Column-2', 'Column-3']
   const containers = Object.keys(items);
   const setContainers: React.Dispatch<
     React.SetStateAction<UniqueIdentifier[]>
@@ -140,7 +167,6 @@ export function MultipleContainers({
       onColumnOrderChange(updater);
     }
   };
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
   const isSortingContainer = activeId ? containers.includes(activeId) : false;
@@ -373,6 +399,7 @@ export function MultipleContainers({
           const overIndex = items[overContainer].indexOf(overId);
 
           if (activeIndex !== overIndex) {
+            
             setItems((items) => ({
               ...items,
               [overContainer]: arrayMove(
@@ -391,7 +418,7 @@ export function MultipleContainers({
       modifiers={modifiers}
     >
       <div
-      className="inline-grid box-border "
+        className="inline-grid box-border space-x-6"
         style={{
           gridAutoFlow: vertical ? "row" : "column",
         }}
@@ -412,6 +439,8 @@ export function MultipleContainers({
                 minimal ? undefined : getColumnNameById(containerId, board)
               }
               columns={columns}
+              tasklength={getTaskLenthById(containerId, board)}
+              colindex={getColumnIndexById(containerId, board)}
               items={items[containerId]}
               scrollable={scrollable}
               style={containerStyle}
@@ -420,7 +449,6 @@ export function MultipleContainers({
             >
               <SortableContext items={items[containerId]} strategy={strategy}>
                 {items[containerId].map((value, index) => {
-
                   return (
                     <SortableItem
                       disabled={isSortingContainer}
@@ -448,7 +476,7 @@ export function MultipleContainers({
               onClick={() => setIsShowColumnModal(true)}
               placeholder
             >
-              + Add column
+              <h1 className="m-auto">+ New Column</h1>
             </DroppableContainer>
           )}
         </SortableContext>
@@ -471,7 +499,6 @@ export function MultipleContainers({
           }
         />
       )}
-      
     </DndContext>
   );
 

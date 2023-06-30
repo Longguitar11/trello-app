@@ -11,7 +11,7 @@ const SideBarModal: React.FC<SideBarModalProps> = ({
   customStyle,
 }: SideBarModalProps) => {
   return (
-    <>
+    <div className="z-10">
       <div
         onClick={() => {
           setIsShowModal(false);
@@ -24,7 +24,7 @@ const SideBarModal: React.FC<SideBarModalProps> = ({
           {childComp}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

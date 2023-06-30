@@ -24,11 +24,7 @@ type HeaderProps = {
   };
 };
 
-const Header = ({
-  isHidden,
-  boards,
-  sideBarData,
-}: HeaderProps) => {
+const Header = ({ isHidden, boards, sideBarData }: HeaderProps) => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [isShowEditBoard, setIsShowEditBoard] = useState(false);
   const [isShowDelBoard, setIsShowDelBoard] = useState(false);
@@ -57,8 +53,6 @@ const Header = ({
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  console.log(currentBoard)
 
   return (
     <>

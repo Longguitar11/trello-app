@@ -116,7 +116,7 @@ const EditTask = ({
           </p>
         )}
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 flex flex-col">
         <Label className="text-sm font-bold dark:text-white" htmlFor="subtasks">
           Subtasks
         </Label>

@@ -12,7 +12,7 @@ const Modal = ({
 }: ModalProps) => {
 
   return (
-    <>
+    <div className="z-10">
       <div
         onClick={() => {
           setIsShowModal(false);
@@ -25,7 +25,7 @@ const Modal = ({
           {childComp}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
