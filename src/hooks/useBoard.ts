@@ -18,14 +18,12 @@ export const useBoard = (boardId?: number) => useAppSelector(
       id: board.id,
       name: board.name,
       columns: board.columnIds.map(columnId => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const column = state.boardStore.columns[columnId]
 
         return {
           id: column.id,
           name: column.name,
           tasks: column.taskIds.map(taskId => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const task = state.boardStore.tasks[taskId]
 
             return {

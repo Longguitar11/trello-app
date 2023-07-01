@@ -7,7 +7,6 @@ import {
   deleteColumn,
   updateBoardColumnsOrder,
   updateColumnTaskIds,
-  updateTaskStatus,
 } from "redux/boardSlice";
 import { useAppDispatch } from "hooks/redux";
 import { UniqueIdentifier } from "@dnd-kit/core";
@@ -63,29 +62,6 @@ const TaskColumn = () => {
         })
       );
     }
-
-    console.log("Items ", items);
-    console.log("New Items ", tempItems);
-
-    for (const i in items) {
-      console.log("Old Task Length ", items[i].length);
-    }
-
-    let newColumnId = 0;
-    for (const colId in tempItems) {
-      console.log("New Task Length ", tempItems[colId].length);
-      if (tempItems[colId].length === items[colId].length + 1) {
-        const [, columnIdNumber] = colId.split("-");
-        newColumnId = parseInt(columnIdNumber);
-        console.log({ newColumnId });
-        break;
-      }
-    }
-
-    console.log("new Column Id ", newColumnId);
-
-    // update status of task in redux
-    dispatch(updateTaskStatus({ columnId: newColumnId, taskId: +activeId! }));
   };
 
   const handleRemoveColumn = (columnId: number) => {
