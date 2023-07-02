@@ -104,7 +104,7 @@ const MobileSideBar = ({
                     src="./imgs/icon-board.svg"
                     alt="board"
                   />
-                  <h3>{item.name}</h3>
+                  <h3 className="truncate">{item.name}</h3>
                 </div>
               ))}
               <div

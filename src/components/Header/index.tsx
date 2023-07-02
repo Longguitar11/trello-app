@@ -185,7 +185,7 @@ const Header = ({ isHidden, boards, sideBarData }: HeaderProps) => {
       {isShowCreateBoard && (
         <Modal
           setIsShowModal={setIsShowCreateBoard}
-          childComp={<CreateBoard setIsShowModal={setIsShowModal} />}
+          childComp={<CreateBoard setIsShowModal={setIsShowCreateBoard} />}
           customStyle="z-10"
         />
       )}
