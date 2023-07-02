@@ -91,7 +91,7 @@ const TaskColumn = () => {
   return (
     <>
       {board.columns.length > 0 ? (
-        <div className="p-4 mo:p-6 flex gap-x-6 whitespace-nowrap overflow-auto no-scrollbar">
+        <div className="p-4 mo:p-6 flex gap-x-6 overflow-auto no-scrollbar">
           <MultipleContainers
             activeId={activeId}
             setActiveId={setActiveId}

@@ -1,21 +1,21 @@
-import { useFieldArray, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Input, Label } from '../ui'
-import { useDispatch } from 'react-redux'
-import { BoardForm, BoardSchema } from 'components/CreateBoard'
-import { Board } from 'constants/board'
-import { updateBoard } from 'redux/boardSlice'
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Input, Label } from "../ui";
+import { useDispatch } from "react-redux";
+import { BoardForm, BoardSchema } from "components/CreateBoard";
+import { Board } from "constants/board";
+import { updateBoard } from "redux/boardSlice";
 
 export type BoardFormProps = {
-  onSubmit?: (task: BoardForm) => void
-  mode?: 'create' | 'edit'
-  submitting?: boolean
-  submitText?: string
-  submittingText?: string
-  initialData?: Partial<BoardForm>
-  setIsShowModal: (value: boolean) => void
-  currentBoard: Board
-}
+  onSubmit?: (task: BoardForm) => void;
+  mode?: "create" | "edit";
+  submitting?: boolean;
+  submitText?: string;
+  submittingText?: string;
+  initialData?: Partial<BoardForm>;
+  setIsShowModal: (value: boolean) => void;
+  currentBoard: Board;
+};
 
 const EditBoard = ({
   onSubmit,
@@ -23,7 +23,7 @@ const EditBoard = ({
   initialData = { name: currentBoard?.name, columns: currentBoard?.columns },
   setIsShowModal,
 }: BoardFormProps) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const {
     handleSubmit,
@@ -32,21 +32,21 @@ const EditBoard = ({
     formState: { errors },
   } = useForm<BoardForm>({
     resolver: zodResolver(BoardSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: initialData,
-  })
+  });
 
   // use useFieldArray for columns
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'columns',
-  })
+    name: "columns",
+  });
 
   onSubmit = (editedBoard: BoardForm) => {
-    const data = { ...editedBoard, id: currentBoard.id } as Board
-    dispatch(updateBoard(data))
-    setIsShowModal(false)
-  }
+    const data = { ...editedBoard, id: currentBoard.id } as Board;
+    dispatch(updateBoard(data));
+    setIsShowModal(false);
+  };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -57,7 +57,7 @@ const EditBoard = ({
         </Label>
         <Input
           id="name"
-          {...register('name', { required: true })}
+          {...register("name", { required: true })}
           placeholder="e.g. Web Design"
         />
         {errors.name && (
@@ -88,7 +88,7 @@ const EditBoard = ({
         ))}
         {errors.columns && (
           <p className="text-red" role="alert">
-            The title of columns cannot be empty
+            Column name should be less than 10 characters
           </p>
         )}
 
@@ -98,12 +98,12 @@ const EditBoard = ({
           onClick={() => {
             append({
               id: new Date().getTime(),
-              name: '',
+              name: "",
               tasks: [],
-            })
+            });
           }}
         >
-          +Add New Columns
+          +Add New Column
         </Button>
       </div>
 
@@ -111,7 +111,7 @@ const EditBoard = ({
         Save Changes
       </Button>
     </form>
-  )
-}
+  );
+};
 
-export default EditBoard
+export default EditBoard;

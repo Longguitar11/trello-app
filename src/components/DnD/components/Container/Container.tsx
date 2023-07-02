@@ -76,7 +76,7 @@ export const Container = forwardRef<HTMLDivElement, Props>(
                   colors[props.colindex ? props.colindex : 0].color
                 } w-[15px] h-[15px] rounded-full`}
               ></div>
-              <h4 className="text-grey tracking-[2.4px] uppercase">{label}</h4>
+              <h4 className="text-grey tracking-[2.4px] uppercase truncate">{label}</h4>
               <h4 className="text-grey tracking-[2.4px]">
                 ({props.tasklength || 0})
               </h4>

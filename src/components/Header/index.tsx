@@ -61,7 +61,7 @@ const Header = ({ isHidden, boards, sideBarData }: HeaderProps) => {
           isHidden
             ? "w-full"
             : "ta:w-[calc(100%-300px)] mo:w-[calc(100%-260px)] w-full"
-        } dark:bg-dark-grey bg-white ta:h-[100px] mo:h-[80px] h-16 fixed right-0 top-0 z-10 flex dark:border-dark border-light border-b-2`}
+        } dark:bg-dark-grey bg-white ta:h-[100px] mo:h-[80px] h-16 fixed right-0 top-0 z-[1] flex dark:border-dark border-light border-b-2`}
       >
         {isHidden && (
           <section className="flex justify-center items-center gap-x-4 ta:w-[210px] w-[200px] dark:border-dark border-light border-r-2">

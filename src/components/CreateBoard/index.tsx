@@ -11,13 +11,36 @@ import { Columns } from "constants/columns";
 export const BoardSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, { message: "Title is required" }),
-  columns: z.array(
-    z.object({
-      id: z.number().optional(),
-      name: z.string().min(1, { message: "Title of subtask cannot be empty" }),
-      tasks: z.array(z.any()),
-    })
-  ),
+  columns: z
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string().superRefine((val, ctx) => {
+          if (val.length < 1) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Column name can't be empty",
+              fatal: true,
+            });
+
+            return z.NEVER;
+          }
+
+          if (val.length >= 10) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Column name should be less than 10 characters",
+            });
+          }
+        }),
+        // min(1, { message: "Column name is required" }),
+        // .max(20, {
+        //   message: "Name of column can't be greater than 20 characters",
+        // }),
+        tasks: z.array(z.any()),
+      })
+    )
+    .optional(),
 });
 
 export type BoardForm = z.infer<typeof BoardSchema>;
@@ -73,7 +96,7 @@ const CreateBoard = ({
       id,
       name: board.name,
       columns: board.columns as Columns[],
-    }
+    };
 
     dispatch(addBoard(newBoard));
     console.log("create board ", { ...board, id });
@@ -105,38 +128,45 @@ const CreateBoard = ({
       </div>
 
       <div>
-        <Label className="text-sm font-bold mb-2 dark:text-white" htmlFor="columns">
+        <Label
+          className="text-sm font-bold mb-2 dark:text-white"
+          htmlFor="columns"
+        >
           Columns
         </Label>
         <div className="space-y-3">
           {fields.map((field, index) => (
-            <div key={field.id} className="flex gap-x-4 items-center">
-              <Input
-                {...register(`columns.${index}.name`)}
-                id="columns"
-                type="text"
-              />
-              <img
-                onClick={() => remove(index)}
-                className="w-4 h-4 cursor-pointer"
-                src="./imgs/icon-cross.svg"
-                alt="cross"
-              />
+            <div key={field.id}>
+              <div className="flex gap-x-4 items-center">
+                <Input
+                  {...register(`columns.${index}.name`)}
+                  id="columns"
+                  type="text"
+                />
+                <img
+                  onClick={() => remove(index)}
+                  className="w-4 h-4 cursor-pointer"
+                  src="./imgs/icon-cross.svg"
+                  alt="cross"
+                />
+              </div>
+              {errors.columns && (
+                <p className="text-red" role="alert">
+                  Column name should be less than 10 characters
+                </p>
+              )}
             </div>
           ))}
-          {errors.columns && (
-            <p className="text-red" role="alert">
-              The title of columns cannot be empty
-            </p>
-          )}
         </div>
 
         <Button
           variant="secondary"
           className="w-full mt-3"
-          onClick={() => append({ id: new Date().getTime(), name: "", tasks: [] })}
+          onClick={() =>
+            append({ id: new Date().getTime(), name: "", tasks: [] })
+          }
         >
-          +Add New Columns
+          +Add New Column
         </Button>
       </div>
 
