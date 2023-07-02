@@ -120,11 +120,11 @@ const ViewTask = ({
                   onCheckedChange={() => handleCheck(sub.id)}
                 />
                 <h4
-                  className={`${
+                  className={`truncate ${
                     sub.isDone
                       ? "line-through opacity-50 dark:text-white"
                       : "text-black dark:text-white"
-                  }`}
+                  } `}
                 >
                   {sub.title}
                 </h4>
