@@ -169,7 +169,7 @@ export function MultipleContainers({
   };
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
-  const isSortingContainer = activeId ? containers.includes(activeId) : false;
+  const isSortingContainer = activeId ? containers.includes(activeId.toString()) : false;
   const [isShowColumnModal, setIsShowColumnModal] = useState(false);
 
   /**
@@ -484,7 +484,7 @@ export function MultipleContainers({
       {createPortal(
         <DragOverlay adjustScale={adjustScale} dropAnimation={dropAnimation}>
           {activeId
-            ? containers.includes(activeId)
+            ? containers.includes(activeId.toString())
               ? renderContainerDragOverlay(activeId)
               : renderSortableItemDragOverlay(activeId)
             : null}

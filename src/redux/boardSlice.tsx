@@ -77,20 +77,17 @@ const appSlice = createSlice({
     },
     deleteTask: (state, action: PayloadAction<Task>) => {
       console.log("delete data ", action.payload);
-      // delete from task store
-      delete state.tasks[action.payload.id];
 
       // get column
       const column = state.columns[+action.payload.status];
 
       // remove task id from column
-      if (column) {
-        column.taskIds = column.taskIds.filter(
-          (id) => id !== action.payload.id
-        );
-      } else {
-        console.log("cannot find the column");
-      }
+      column.taskIds = column.taskIds.filter(
+        (id) => id !== action.payload.id
+      );
+
+      // delete from task store
+      // delete state.tasks[action.payload.id];
     },
     addColumn: (
       state,
@@ -136,6 +133,11 @@ const appSlice = createSlice({
     ) => {
       // update column taskIds
       state.columns[action.payload.columnId].taskIds = action.payload.taskIds;
+
+      // update task status
+      action.payload.taskIds.forEach((taskId) => {
+        state.tasks[taskId].status = action.payload.columnId.toString();
+      });
     },
     updateTaskStatus: (
       state,
@@ -144,7 +146,24 @@ const appSlice = createSlice({
         taskId: number
       }>
     ) => {
+
+      const oldColumnId = state.tasks[action.payload.taskId].status
+
+      // remove from old column
+      const oldColumn = state.columns[parseInt(oldColumnId)];
+
+      oldColumn.taskIds = oldColumn.taskIds.filter(
+        (id) => id !== action.payload.taskId
+      );
+
+      const newColumnId =  action.payload.columnId.toString();
+
+      // add to new column
       state.tasks[action.payload.taskId].status = action.payload.columnId.toString();
+
+      const newColumn = state.columns[parseInt(newColumnId)];
+
+      newColumn.taskIds.push(action.payload.taskId);
     },
     updateBoardColumnsOrder: (
       state,

@@ -7,7 +7,6 @@ import {
   deleteColumn,
   updateBoardColumnsOrder,
   updateColumnTaskIds,
-  updateTaskStatus,
 } from "redux/boardSlice";
 import { useAppDispatch } from "hooks/redux";
 import { UniqueIdentifier } from "@dnd-kit/core";

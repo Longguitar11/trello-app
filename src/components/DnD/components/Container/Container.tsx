@@ -49,7 +49,7 @@ export const Container = forwardRef<HTMLDivElement, Props>(
     return (
       <Component
         {...props}
-        ref={ref}
+        ref={ref as any}
         style={
           {
             ...style,
