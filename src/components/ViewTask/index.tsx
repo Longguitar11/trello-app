@@ -103,7 +103,7 @@ const ViewTask = ({
             />
           )}
         </div>
-        <div className="text-grey">{task?.desc}</div>
+        <div className="text-grey truncate">{task?.desc}</div>
         <div className="space-y-4">
           <h4 className="text-grey dark:text-white">
             Subtasks ({countSubtaskDone(task.subtasks)} of{" "}
