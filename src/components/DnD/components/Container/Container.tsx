@@ -94,7 +94,7 @@ export const Container = forwardRef<HTMLDivElement, Props>(
             {children}
           </div>
         ) : (
-          <ul className="space-y-[20px]">{children}</ul>
+          <ul className="space-y-[20px] max-h-calc[605.6px-24px-15px] overflow-y-auto no-scrollbar">{children}</ul>
         )}
       </Component>
     );

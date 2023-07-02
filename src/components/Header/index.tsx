@@ -126,7 +126,7 @@ const Header = ({ isHidden, boards, sideBarData }: HeaderProps) => {
 
             {isShowDropdown && (
               <Dropdown
-                customStyle="top-16"
+                customStyle="top-16 z-10"
                 data={EditAndDelBoard}
                 // set function must be transmit rightly follow to data of dropdown
                 setIsShowModal={[setIsShowEditBoard, setIsShowDelBoard]}

@@ -45,7 +45,7 @@ const Layout = () => {
         }}
       />
       <div
-        className={`ta:mt-[100px] mo:mt-[80px] mt-16 ta:min-h-[calc(100vh-100px)] mo:min-h-[calc(100vh-80px)] min-h-[calc(100vh-64px)] dark:bg-very-dark-grey bg-light-grey flex ${
+        className={`ta:mt-[100px] mo:mt-[80px] mt-16 ta:h-[calc(100vh-100px)] mo:h-[calc(100vh-80px)] h-[calc(100vh-64px)] dark:bg-very-dark-grey bg-light-grey flex ${
           isHidden
             ? "min-w-full"
             : "ta:ml-[300px] mo:ml-[260px] ta:min-w-[calc(100%-300px)] mo:min-w-[calc(100%-260px)] w-full no-scrollbar"

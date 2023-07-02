@@ -171,7 +171,7 @@ const SideBar = ({
       ) : (
         <div
           onClick={showSideBar}
-          className="fixed left-0 bottom-8 bg-purple p-[20px] rounded-r-full cursor-pointer hover:bg-purple-hover transition-opacity duration-200"
+          className="fixed left-0 bottom-8 z-10 bg-purple p-[20px] rounded-r-full cursor-pointer hover:bg-purple-hover transition-opacity duration-200"
         >
           <img
             className=""
