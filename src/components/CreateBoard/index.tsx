@@ -150,13 +150,13 @@ const CreateBoard = ({
                   alt="cross"
                 />
               </div>
-              {errors.columns && (
-                <p className="text-red" role="alert">
-                  Column name should be less than 10 characters
-                </p>
-              )}
             </div>
           ))}
+          {errors.columns && (
+            <p className="text-red" role="alert">
+              Column name should be less than 10 characters
+            </p>
+          )}
         </div>
 
         <Button
