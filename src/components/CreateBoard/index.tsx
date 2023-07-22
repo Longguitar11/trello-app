@@ -85,10 +85,6 @@ const CreateBoard = ({
     name: "columns",
   });
 
-  // if boards doesn't have any elements, then id is 0
-  // if boards have elements, id is id of the last element add to 1
-  // > 0,
-
   onSubmit = (board: BoardForm) => {
     const id = new Date().getTime();
 
@@ -134,7 +130,7 @@ const CreateBoard = ({
         >
           Columns
         </Label>
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-[248px] overflow-y-auto no-scrollbar">
           {fields.map((field, index) => (
             <div key={field.id}>
               <div className="flex gap-x-4 items-center">
@@ -152,12 +148,12 @@ const CreateBoard = ({
               </div>
             </div>
           ))}
+        </div>
           {errors.columns && (
-            <p className="text-red" role="alert">
+            <p className="text-red mt-3" role="alert">
               Column name should be less than 10 characters
             </p>
           )}
-        </div>
 
         <Button
           variant="secondary"

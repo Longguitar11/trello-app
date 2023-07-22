@@ -1,62 +1,62 @@
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button, Input, Label } from '../ui'
-import { Textarea } from '../ui/textarea'
-import { useDispatch } from 'react-redux'
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button, Input, Label } from "../ui";
+import { Textarea } from "../ui/textarea";
+import { useDispatch } from "react-redux";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select'
-import { Board } from 'constants/board'
-import { useState } from 'react'
-import { Task } from 'constants/task'
-import { addTask } from 'redux/boardSlice'
+} from "components/ui/select";
+import { Board } from "constants/board";
+import { useState } from "react";
+import { Task } from "constants/task";
+import { addTask } from "redux/boardSlice";
 
 export const TaskSchema = z.object({
   id: z.number().optional(),
-  title: z.string().min(1, { message: 'Title is required' }),
-  desc: z.string().min(1, { message: 'Description is required' }),
+  title: z.string().min(1, { message: "Title is required" }),
+  desc: z.string().min(1, { message: "Description is required" }),
   subtasks: z.array(
     z.object({
       id: z.number(),
-      title: z.string().min(1, { message: 'Title of subtask cannot be empty' }),
+      title: z.string().min(1, { message: "Title of subtask cannot be empty" }),
       isDone: z.boolean(),
     })
   ),
   status: z.string().min(1, {
-    message: 'The character length of status must be greater than 1',
+    message: "The character length of status must be greater than 1",
   }),
-})
+});
 
-export type TaskForm = z.infer<typeof TaskSchema>
+export type TaskForm = z.infer<typeof TaskSchema>;
 
 export type TaskFormProps = {
-  onSubmit?: (task: TaskForm) => void
-  mode?: 'create' | 'edit'
-  submitting?: boolean
-  submitText?: string
-  submittingText?: string
-  initialData?: Partial<TaskForm>
-  setIsShowModal: (value: boolean) => void
-  board: Board
-}
+  onSubmit?: (task: TaskForm) => void;
+  mode?: "create" | "edit";
+  submitting?: boolean;
+  submitText?: string;
+  submittingText?: string;
+  initialData?: Partial<TaskForm>;
+  setIsShowModal: (value: boolean) => void;
+  board: Board;
+};
 
 const CreateTask = ({
   onSubmit,
   initialData = {
-    subtasks: [{ id: 0, title: '', isDone: false }],
-    status: 'todo',
+    subtasks: [{ id: 0, title: "", isDone: false }],
+    status: "todo",
   },
   setIsShowModal,
   board,
 }: TaskFormProps) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const [subtaskId, setSubtaskId] = useState(0)
+  const [subtaskId, setSubtaskId] = useState(0);
 
   const {
     handleSubmit,
@@ -65,27 +65,27 @@ const CreateTask = ({
     formState: { errors },
   } = useForm<TaskForm>({
     resolver: zodResolver(TaskSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: initialData,
-  })
+  });
 
   // use useFieldArray for subtasks
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'subtasks',
-  })
+    name: "subtasks",
+  });
 
   onSubmit = (task: TaskForm) => {
     // the task will be appended to corresponding to its column
     const newTask: Task = {
       id: new Date().getTime(),
       ...task,
-    }
+    };
 
-    dispatch(addTask(newTask))
+    dispatch(addTask(newTask));
 
-    setIsShowModal(false)
-  }
+    setIsShowModal(false);
+  };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -97,7 +97,7 @@ const CreateTask = ({
         <Input
           id="title"
           autoFocus
-          {...register('title', { required: true })}
+          {...register("title", { required: true })}
           placeholder="e.g. Learn English"
         />
         {errors.title && (
@@ -111,7 +111,7 @@ const CreateTask = ({
           Description
         </Label>
         <Textarea
-          {...register('desc', { required: true })}
+          {...register("desc", { required: true })}
           placeholder="e.g. It’s always good to take a break. This 15 minute break will recharge the batteries a little."
           id="desc"
         />
@@ -125,25 +125,27 @@ const CreateTask = ({
         <Label className="text-sm font-bold dark:text-white" htmlFor="subtasks">
           Subtasks
         </Label>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-x-4 items-center">
-            <Input
-              {...register(`subtasks.${index}.title`)}
-              id="subtasks"
-              type="text"
-              placeholder="e.g. Make coffee"
-            />
-            <img
-              onClick={() => {
-                remove(index)
-                fields.length === 1 && setSubtaskId(0)
-              }}
-              className="w-4 h-4 cursor-pointer"
-              src="./imgs/icon-cross.svg"
-              alt="cross"
-            />
-          </div>
-        ))}
+        <div className="space-y-2 max-h-[136px] overflow-y-auto no-scrollbar">
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex gap-x-4 items-center">
+              <Input
+                {...register(`subtasks.${index}.title`)}
+                id="subtasks"
+                type="text"
+                placeholder="e.g. Make coffee"
+              />
+              <img
+                onClick={() => {
+                  remove(index);
+                  fields.length === 1 && setSubtaskId(0);
+                }}
+                className="w-4 h-4 cursor-pointer"
+                src="./imgs/icon-cross.svg"
+                alt="cross"
+              />
+            </div>
+          ))}
+        </div>
         {errors.subtasks && (
           <p className="text-red" role="alert">
             The title of subtask cannot be empty
@@ -154,9 +156,9 @@ const CreateTask = ({
           variant="secondary"
           className="w-full"
           onClick={() => {
-            setSubtaskId((pre) => pre + 1)
-            append({ id: subtaskId + 1, title: '', isDone: false })
-            console.log('add subtask id ', subtaskId)
+            setSubtaskId((pre) => pre + 1);
+            append({ id: subtaskId + 1, title: "", isDone: false });
+            console.log("add subtask id ", subtaskId);
           }}
         >
           +Add New Subtask
@@ -178,7 +180,7 @@ const CreateTask = ({
                   target: {
                     value: value,
                   },
-                })
+                });
               }}
             >
               <SelectTrigger>
@@ -204,7 +206,7 @@ const CreateTask = ({
         Create Task
       </Button>
     </form>
-  )
-}
+  );
+};
 
-export default CreateTask
+export default CreateTask;

@@ -109,7 +109,7 @@ const ViewTask = ({
             Subtasks ({countSubtaskDone(task.subtasks)} of{" "}
             {task.subtasks.length})
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar">
             {task?.subtasks?.map((sub) => (
               <div
                 className="flex items-center gap-x-4 p-3 rounded-[4px] dark:bg-very-dark-grey bg-light-grey"

@@ -71,21 +71,23 @@ const EditBoard = ({
         <Label className="text-sm font-bold dark:text-white" htmlFor="columns">
           Columns
         </Label>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-x-4 items-center">
-            <Input
-              {...register(`columns.${index}.name`)}
-              id="columns"
-              type="text"
-            />
-            <img
-              onClick={() => remove(index)}
-              className="w-4 h-4 cursor-pointer"
-              src="./imgs/icon-cross.svg"
-              alt="cross"
-            />
-          </div>
-        ))}
+        <div className="space-y-3 max-h-[248px] overflow-y-auto no-scrollbar">
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex gap-x-4 items-center">
+              <Input
+                {...register(`columns.${index}.name`)}
+                id="columns"
+                type="text"
+              />
+              <img
+                onClick={() => remove(index)}
+                className="w-4 h-4 cursor-pointer"
+                src="./imgs/icon-cross.svg"
+                alt="cross"
+              />
+            </div>
+          ))}
+        </div>
         {errors.columns && (
           <p className="text-red" role="alert">
             Column name should be less than 10 characters

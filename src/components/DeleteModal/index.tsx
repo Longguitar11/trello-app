@@ -70,17 +70,26 @@ const DeleteModal = ({
         Delete this {currentTask ? "task" : "board"}
       </h2>
       {!currentTask ? (
-        <p className="text-grey">
-          Are you sure you want to delete the{" "}
-          <span className="text-red">{currentBoard?.name}</span> board? This
-          action will remove all columns and tasks and cannot be reversed.
-        </p>
+        <div>
+          <p className="text-grey truncate">
+            Are you sure you want to delete the{" "}
+            <span className="text-red">{currentBoard?.name} board?</span>
+          </p>
+          <p className="text-grey">
+            This action will remove all columns and tasks and cannot be
+            reversed.
+          </p>
+        </div>
       ) : (
-        <p className="text-grey whitespace-normal">
-          Are you sure you want to delete the{" "}
-          <span className="text-red">{currentTask?.title}</span> {' '}
-          task and its subtasks? This action cannot be reversed.
-        </p>
+        <div>
+          <p className="text-grey whitespace-normal">
+            Are you sure you want to delete the{" "}
+            <span className="text-red truncate">
+              {currentTask?.title} task and its subtasks?{" "}
+            </span>{" "}
+          </p>
+          <p>This action cannot be reversed.</p>
+        </div>
       )}
       <div className="flex justify-between gap-x-4">
         <Button
